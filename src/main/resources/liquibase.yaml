@@ -1,4 +1,4 @@
 changeLogFile: src/main/resources/db/changelog/db.changelog-master.yaml
-url: jdbc:postgresql://localhost:5432/userdb
-username: user
-password: password
+url: ${USER_SERVICE_DATABASE_URL}
+username: ${USER_SERVICE_DATABASE_USERNAME}
+password: ${USER_SERVICE_DATABASE_PASSWORD}
