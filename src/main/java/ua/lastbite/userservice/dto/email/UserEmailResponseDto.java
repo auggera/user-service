@@ -10,5 +10,5 @@ import lombok.*;
 public class UserEmailResponseDto {
 
     private String email;
-    private String emailVerified;
+    private boolean verified;
 }
