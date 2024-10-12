@@ -1,4 +1,4 @@
-package ua.lastbite.userservice.dto;
+package ua.lastbite.userservice.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

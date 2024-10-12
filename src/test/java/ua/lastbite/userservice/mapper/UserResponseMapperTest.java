@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import ua.lastbite.userservice.dto.UserResponseDto;
+import ua.lastbite.userservice.dto.user.UserResponseDto;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
 

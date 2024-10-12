@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.lastbite.userservice.dto.*;
+import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.service.UserService;
 
 import java.net.URI;

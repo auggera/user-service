@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import ua.lastbite.userservice.dto.*;
+import ua.lastbite.userservice.dto.user.UserRegistrationRequest;
 import ua.lastbite.userservice.model.CountryCode;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;

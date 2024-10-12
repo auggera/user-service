@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
-import ua.lastbite.userservice.dto.UserResponseDto;
+import ua.lastbite.userservice.dto.user.UserResponseDto;
 import ua.lastbite.userservice.model.User;
 
 @Mapper(componentModel = "spring")

@@ -2,7 +2,7 @@ package ua.lastbite.userservice.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ua.lastbite.userservice.dto.ChangePhoneNumberRequest;
+import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequest;
 
 public class ChangePhoneNumberValidator
         extends AbstractPhoneNumberValidator

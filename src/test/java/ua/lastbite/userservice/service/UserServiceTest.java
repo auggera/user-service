@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import ua.lastbite.userservice.dto.*;
+import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
 import ua.lastbite.userservice.mapper.UserRegistrationMapper;

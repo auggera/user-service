@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ua.lastbite.userservice.dto.ChangePhoneNumberRequest;
+import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequest;
 import ua.lastbite.userservice.model.CountryCode;
 
 public class PhoneNumberValidatorTest {

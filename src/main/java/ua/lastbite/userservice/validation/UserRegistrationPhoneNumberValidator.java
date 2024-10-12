@@ -2,7 +2,7 @@ package ua.lastbite.userservice.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ua.lastbite.userservice.dto.UserRegistrationRequest;
+import ua.lastbite.userservice.dto.user.UserRegistrationRequest;
 
 public class UserRegistrationPhoneNumberValidator
         extends AbstractPhoneNumberValidator
