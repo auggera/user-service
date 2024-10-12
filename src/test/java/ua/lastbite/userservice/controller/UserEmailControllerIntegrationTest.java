@@ -57,7 +57,7 @@ public class UserEmailControllerIntegrationTest {
         mockMvc.perform(get("/api/email/1/info"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
-                .andExpect(jsonPath("$.emailVerified").value(false));
+                .andExpect(jsonPath("$.verified").value(false));
     }
 
     @Test

@@ -34,7 +34,7 @@ public class UserEmailControllerTest {
     void setUp() {
         userEmailResponseDto = new UserEmailResponseDto();
         userEmailResponseDto.setEmail("email@example.com");
-        userEmailResponseDto.setEmailVerified(false);
+        userEmailResponseDto.setVerified(false);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class UserEmailControllerTest {
         mockMvc.perform(get("/api/email/1/info"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("email@example.com"))
-                .andExpect(jsonPath("$.emailVerified").value(false));
+                .andExpect(jsonPath("$.verified").value(false));
     }
 
     @Test

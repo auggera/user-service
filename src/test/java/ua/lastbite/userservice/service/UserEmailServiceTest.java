@@ -47,7 +47,7 @@ public class UserEmailServiceTest {
 
         assertNotNull(response);
         assertEquals(user.getEmail(), response.getEmail());
-        assertEquals(user.isEmailVerified(), response.isEmailVerified());
+        assertEquals(user.isEmailVerified(), response.isVerified());
     }
 
     @Test
