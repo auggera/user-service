@@ -1,5 +1,7 @@
 package ua.lastbite.userservice.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ public class TokenServiceClient {
 
     private final RestTemplate restTemplate;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenServiceClient.class);
+
     @Value("${token-service.url}")
     private String tokenServiceUrl;
 
@@ -23,15 +27,14 @@ public class TokenServiceClient {
         this.restTemplate = restTemplate;
     }
 
-    public boolean validateToken(TokenValidationRequest request) {
+    public TokenValidationResponse verifyToken(TokenValidationRequest request) {
+        LOGGER.info("Validating token");
         String urlRequest = tokenServiceUrl + "/api/tokens/validate";
 
-        TokenValidationResponse response = restTemplate.postForObject(urlRequest, request, TokenValidationResponse.class);
-
-        if (response == null) {
-            throw new TokenValidationException("Something went wrong.");
-        }
-
-        return response.isValid();
+        return Optional.ofNullable(restTemplate.postForObject(urlRequest, request, TokenValidationResponse.class))
+                .orElseThrow(() -> {
+                    LOGGER.error("Token validation failed for request: {}", request);
+                    return new TokenValidationException("Token validation failed");
+                });
     }
 }
