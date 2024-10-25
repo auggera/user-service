@@ -31,10 +31,6 @@ public class TokenServiceClient {
         LOGGER.info("Validating token");
         String urlRequest = tokenServiceUrl + "/api/tokens/validate";
 
-        return Optional.ofNullable(restTemplate.postForObject(urlRequest, request, TokenValidationResponse.class))
-                .orElseThrow(() -> {
-                    LOGGER.error("Token validation failed for request: {}", request);
-                    return new TokenValidationException("Token validation failed");
-                });
+        return restTemplate.postForObject(urlRequest, request, TokenValidationResponse.class);
     }
 }

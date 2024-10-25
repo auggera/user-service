@@ -38,11 +38,7 @@ public class UserEmailService {
 
         TokenValidationResponse response = tokenServiceClient.verifyToken(request);
 
-        LOGGER.info("Received response :{}", response);
-
-        if (!response.isValid()) {
-            throw new InvalidTokenException("Token is invalid or expired");
-        }
+        LOGGER.info("Token validated successfully for user ID: {}", response.getUserId());
 
         User user = userRepository.findById(response.getUserId())
                 .orElseThrow(() -> new UserNotFoundException(response.getUserId()));
