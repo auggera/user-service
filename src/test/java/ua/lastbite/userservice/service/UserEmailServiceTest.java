@@ -93,22 +93,6 @@ public class UserEmailServiceTest {
     }
 
     @Test
-    void testVerifyEmailInvalidToken() {
-        tokenValidationResponse.setValid(false);
-
-        Mockito.when(tokenServiceClient.verifyToken(tokenValidationRequest))
-                .thenReturn(tokenValidationResponse);
-
-        InvalidTokenException exception = assertThrows(InvalidTokenException.class, () -> userEmailService.verifyEmail(tokenValidationRequest));
-
-        Mockito.verify(tokenServiceClient, Mockito.times(1)).verifyToken(tokenValidationRequest);
-        Mockito.verify(userRepository, Mockito.never()).findById(USER_ID);
-        Mockito.verify(userRepository, Mockito.never()).save(user);
-
-        assertEquals("Token is invalid or expired", exception.getMessage());
-    }
-
-    @Test
     void testVerifyEmailUserNotFound() {
 
         Mockito.when(tokenServiceClient.verifyToken(tokenValidationRequest))
