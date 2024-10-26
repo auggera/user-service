@@ -3,6 +3,8 @@ package ua.lastbite.userservice.exception.global;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,8 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import ua.lastbite.userservice.exception.token.InvalidTokenException;
-import ua.lastbite.userservice.exception.token.TokenValidationException;
+import ua.lastbite.userservice.exception.token.*;
 import ua.lastbite.userservice.exception.user.*;
 
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -108,6 +111,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 String.format("Invalid value for %s: %s", argumentName, value)
         );
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<String> handleTokenNotFound(TokenNotFoundException ex) {
+        LOGGER.error("Handled TokenNotFoundException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TokenAlreadyUsedException.class)
+    public ResponseEntity<String> handleTokenAlreadyUsed(TokenAlreadyUsedException ex) {
+        LOGGER.error("Handled TokenAlreadyUsedException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<String> handleTokenExpiredException(TokenExpiredException ex) {
+        LOGGER.error("Handled TokenExpiredException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.GONE).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<String> handleServiceUnavailable(ServiceUnavailableException ex) {
+        LOGGER.error("Handled ServiceUnavailableException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
     }
 
     @ExceptionHandler(NameNotChangedException.class)
