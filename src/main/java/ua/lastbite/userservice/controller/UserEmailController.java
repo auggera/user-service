@@ -1,5 +1,6 @@
 package ua.lastbite.userservice.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,8 @@ public class UserEmailController {
         return ResponseEntity.ok(userEmailResponseDto);
     }
 
-
-    @GetMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestParam("tokenValue") @RequestBody TokenValidationRequest request) {
+    @PostMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@Valid @RequestBody TokenValidationRequest request) {
         userEmailService.verifyEmail(request);
         return ResponseEntity.ok("Email successfully verified");
     }
