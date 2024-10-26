@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
 import ua.lastbite.userservice.dto.token.TokenValidationRequest;
 import ua.lastbite.userservice.dto.token.TokenValidationResponse;
-import ua.lastbite.userservice.exception.token.InvalidTokenException;
-import ua.lastbite.userservice.exception.token.TokenValidationException;
 import ua.lastbite.userservice.exception.user.UserNotFoundException;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.repository.UserRepository;
