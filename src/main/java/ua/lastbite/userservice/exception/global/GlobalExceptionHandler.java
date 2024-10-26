@@ -47,18 +47,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    @ExceptionHandler(TokenValidationException.class)
-    public ResponseEntity<String> handleTokenValidationException(TokenValidationException ex) {
-        LOGGER.error("Handled TokenValidationException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
-        LOGGER.error("Handled InvalidTokenException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
         LOGGER.error("Handled UserNotFoundException: {}", ex.getMessage());
@@ -68,13 +56,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         LOGGER.error("Handled EmailAlreadyExistsException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
     public ResponseEntity<String> handlePhoneNumberAlreadyExists(PhoneNumberAlreadyExistsException ex) {
         LOGGER.error("Handled PhoneNumberAlreadyExistsException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(IncorrectCurrentPasswordException.class)
@@ -86,19 +74,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAddressNotChangedException.class)
     public ResponseEntity<String> handleEmailNotChanged(EmailAddressNotChangedException ex) {
         LOGGER.error("Handled EmailNotChangedException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(PasswordNotChangedException.class)
     public ResponseEntity<String> handleSamePassword(PasswordNotChangedException ex) {
         LOGGER.error("Handled PasswordNotChangedException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(PhoneNumberNotChangedException.class)
     public ResponseEntity<String> handleSamePhoneNumber(PhoneNumberNotChangedException ex) {
         LOGGER.error("Handled PhoneNumberNotChangedException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -115,6 +103,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 String.format("Invalid value for %s: %s", argumentName, value)
         );
+    }
+
+    @ExceptionHandler(TokenValidationException.class)
+    public ResponseEntity<String> handleTokenValidationException(TokenValidationException ex) {
+        LOGGER.error("Handled TokenValidationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
+        LOGGER.error("Handled InvalidTokenException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(TokenNotFoundException.class)

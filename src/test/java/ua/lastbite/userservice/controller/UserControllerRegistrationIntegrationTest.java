@@ -108,7 +108,7 @@ public class UserControllerRegistrationIntegrationTest {
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Email " + existingUser.getEmail() + " is already in use"));
     }
 
@@ -131,7 +131,7 @@ public class UserControllerRegistrationIntegrationTest {
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Phone number " + userRegistrationRequest.getPhoneNumber() + " is already in use"));
     }
 

@@ -93,7 +93,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/register")
                 .content(objectMapper.writeValueAsString(userRegistrationRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Email " + userRegistrationRequest.getEmail() + " is already in use"));
     }
 
@@ -105,7 +105,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/api/users/register")
                 .content(objectMapper.writeValueAsString(userRegistrationRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Phone number " + userRegistrationRequest.getPhoneNumber() + " is already in use"));
     }
 
@@ -189,7 +189,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1/email")
                 .content(objectMapper.writeValueAsString(changeEmailRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New email is the same as the current email"));
     }
 
@@ -201,7 +201,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1/email")
                 .content(objectMapper.writeValueAsString(changeEmailRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("Email " + changeEmailRequest.getNewEmail() + " is already in use"));
     }
 
@@ -252,7 +252,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1/password")
                 .content(objectMapper.writeValueAsString(changePasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New password cannot be the same as the current password"));
     }
 
@@ -291,7 +291,7 @@ public class UserControllerTest {
         mockMvc.perform(put("/api/users/1/phone")
                 .content(objectMapper.writeValueAsString(changePhoneNumberRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New phone number cannot be the same as the current phone number"));
     }
 

@@ -162,7 +162,7 @@ public class UserControllerCommonIntegrationTest {
         mockMvc.perform(put("/api/users/1/email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeEmailRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New email is the same as the current email"));
     }
 
@@ -243,7 +243,7 @@ public class UserControllerCommonIntegrationTest {
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New password cannot be the same as the current password"));
     }
 
@@ -336,7 +336,7 @@ public class UserControllerCommonIntegrationTest {
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("New phone number cannot be the same as the current phone number"));
     }
 
