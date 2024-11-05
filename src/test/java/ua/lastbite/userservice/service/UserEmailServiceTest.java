@@ -25,8 +25,8 @@ public class UserEmailServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private User user;
     private static final int USER_ID = 1;
+    private User user;
 
     @BeforeEach
     void setUp() {
@@ -60,5 +60,28 @@ public class UserEmailServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).findById(USER_ID);
 
         assertEquals("User with ID 1 not found", exception.getMessage());
+    }
+
+    @Test
+    void testVerifyEmailSuccessfully() {
+        Mockito.when(userRepository.findById(USER_ID))
+                .thenReturn(Optional.of(user));
+
+        userEmailService.verifyEmail(USER_ID);
+
+        Mockito.verify(userRepository).save(Mockito.argThat(User::isEmailVerified));
+        assertTrue(user.isEmailVerified(), "User's email should be verified");
+    }
+
+    @Test
+    void testVerifyEmailUserNotFound() {
+        Mockito.when(userRepository.findById(USER_ID))
+                .thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userEmailService.verifyEmail(USER_ID));
+
+        assertEquals("User with ID 1 not found", exception.getMessage());
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(USER_ID);
     }
 }

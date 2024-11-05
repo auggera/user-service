@@ -1,9 +1,11 @@
 package ua.lastbite.userservice.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
+import ua.lastbite.userservice.dto.token.TokenValidationRequest;
 import ua.lastbite.userservice.service.UserEmailService;
 
 @RestController
@@ -21,5 +23,11 @@ public class UserEmailController {
     public ResponseEntity<UserEmailResponseDto> getUserEmailInfo(@PathVariable Integer userId) {
         UserEmailResponseDto userEmailResponseDto = userEmailService.getUserEmailInfo(userId);
         return ResponseEntity.ok(userEmailResponseDto);
+    }
+
+    @PostMapping("/{userId}/verify-email")
+    public ResponseEntity<String> verifyEmail(@PathVariable Integer userId) {
+        userEmailService.verifyEmail(userId);
+        return ResponseEntity.ok("Email successfully verified");
     }
 }
