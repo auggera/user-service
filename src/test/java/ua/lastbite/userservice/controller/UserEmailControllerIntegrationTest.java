@@ -1,6 +1,5 @@
 package ua.lastbite.userservice.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
 import ua.lastbite.userservice.repository.UserRepository;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,11 +30,9 @@ public class UserEmailControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private static final Integer USER_ID = 1;
     private User user;
 
     @BeforeEach
@@ -58,7 +56,7 @@ public class UserEmailControllerIntegrationTest {
     void testGetUserEmailInfoSuccessfully() throws Exception {
         userRepository.save(user);
 
-        mockMvc.perform(get("/api/email/1/info"))
+        mockMvc.perform(get("/api/email/{userId}/info", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -66,7 +64,27 @@ public class UserEmailControllerIntegrationTest {
 
     @Test
     void testGetUserEmailInfoUserNotFound() throws Exception {
-        mockMvc.perform(get("/api/email/1/info"))
+        mockMvc.perform(get("/api/email/{userId}/info", USER_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with ID 1 not found"));
+    }
+
+    @Test
+    void verifyEmail_Success() throws Exception {
+        userRepository.save(user);
+
+        mockMvc.perform(post("/api/email/{userId}/verify-email", USER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Email successfully verified"));
+
+        User updatedUser = userRepository.findById(USER_ID).orElseThrow();
+        assertTrue(updatedUser.isEmailVerified());
+    }
+
+    @Test
+    void verifyEmail_UserNotFound() throws Exception {
+
+        mockMvc.perform(post("/api/email/{userId}/verify-email", USER_ID))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
     }
