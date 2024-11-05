@@ -49,7 +49,7 @@ public class UserEmailControllerTest {
         Mockito.when(userEmailService.getUserEmailInfo(USER_ID))
                 .thenReturn(userEmailResponseDto);
 
-        mockMvc.perform(get("/api/email/1/info"))
+        mockMvc.perform(get("/api/email/{userId}/info", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("email@example.com"))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -60,8 +60,29 @@ public class UserEmailControllerTest {
         Mockito.when(userEmailService.getUserEmailInfo(USER_ID))
                 .thenThrow(new UserNotFoundException(USER_ID));
 
-        mockMvc.perform(get("/api/email/1/info"))
+        mockMvc.perform(get("/api/email/{userId}/info", USER_ID))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
+
+    @Test
+    void verifyEmailSuccess() throws Exception {
+
+        Mockito.doNothing().when(userEmailService).verifyEmail(USER_ID);
+
+        mockMvc.perform(post("/api/email/{userId}/verify-email", USER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Email successfully verified"));
+    }
+
+    @Test
+    void verifyEmailUserNotFound() throws Exception {
+
+        Mockito.doThrow(new UserNotFoundException(USER_ID)).when(userEmailService).verifyEmail(USER_ID);
+
+        mockMvc.perform(post("/api/email/{userId}/verify-email", USER_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with ID 1 not found"));
+    }
+
 }
