@@ -25,9 +25,9 @@ public class UserEmailController {
         return ResponseEntity.ok(userEmailResponseDto);
     }
 
-    @PostMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@Valid @RequestBody TokenValidationRequest request) {
-        userEmailService.verifyEmail(request);
+    @PostMapping("/{userId}/verify-email")
+    public ResponseEntity<String> verifyEmail(@PathVariable Integer userId) {
+        userEmailService.verifyEmail(userId);
         return ResponseEntity.ok("Email successfully verified");
     }
 }

@@ -36,15 +36,12 @@ public class UserEmailControllerTest {
 
     private static final int USER_ID = 1;
     private UserEmailResponseDto userEmailResponseDto;
-    private TokenValidationRequest tokenValidationRequest;
 
     @BeforeEach
     void setUp() {
         userEmailResponseDto = new UserEmailResponseDto();
         userEmailResponseDto.setEmail("email@example.com");
         userEmailResponseDto.setVerified(false);
-
-        tokenValidationRequest = new TokenValidationRequest("tokenValue123");
     }
 
     @Test
@@ -66,35 +63,5 @@ public class UserEmailControllerTest {
         mockMvc.perform(get("/api/email/1/info"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID " + USER_ID + " not found"));
-    }
-
-    @Test
-    void testVerifyEmailSuccessfully() throws Exception {
-
-        mockMvc.perform(post("/api/email/verify-email")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(tokenValidationRequest)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testVerifyEmailNullRequest() throws Exception {
-        tokenValidationRequest = null;
-
-        mockMvc.perform(post("/api/email/verify-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(tokenValidationRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testVerifyEmailTokenValueIsNull() throws Exception {
-        tokenValidationRequest.setTokenValue(null);
-
-        mockMvc.perform(post("/api/email/verify-email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(tokenValidationRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenValue").value("Token cannot be empty"));
     }
 }
