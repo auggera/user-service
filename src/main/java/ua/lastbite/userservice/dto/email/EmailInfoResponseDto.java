@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class UserEmailInfo {
+public class EmailInfoResponseDto {
 
     private String email;
     private boolean verified;

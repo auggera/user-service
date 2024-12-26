@@ -10,7 +10,7 @@ import ua.lastbite.userservice.validation.ValidName;
 @Setter
 @Getter
 @EqualsAndHashCode
-public class ChangeNameRequest {
+public class UpdateNameRequestDto {
 
     @NotBlank(message = "First name cannot be empty")
     @ValidName

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.lastbite.userservice.dto.email.UserEmailInfo;
+import ua.lastbite.userservice.dto.email.EmailInfoResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.service.UserService;
 
@@ -25,7 +25,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRegistrationRequest request) {
+    public ResponseEntity<UserResponseDto> registerUser(@Valid @RequestBody UserRegistrationRequestDto request) {
         log.info("Request received: POST /api/users - Register user");
         UserResponseDto createdUser = userService.register(request);
 
@@ -60,17 +60,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}/email-info")
-    public ResponseEntity<UserEmailInfo> getUserEmailInfo(@PathVariable Integer id) {
+    public ResponseEntity<EmailInfoResponseDto> getUserEmailInfo(@PathVariable Integer id) {
         log.info("Request received: GET /api/users/{}/email-info - Get user email info", id);
-        UserEmailInfo userEmailInfo = userService.getUserEmailInfo(id);
+        EmailInfoResponseDto emailInfoResponseDto = userService.getUserEmailInfo(id);
 
-        log.debug("Retrieved user email info: {}", userEmailInfo);
-        return ResponseEntity.ok(userEmailInfo);
+        log.debug("Retrieved user email info: {}", emailInfoResponseDto);
+        return ResponseEntity.ok(emailInfoResponseDto);
     }
 
     @PutMapping("/{id}/email")
     public ResponseEntity<Void> changeEmail(@PathVariable Integer id,
-                                            @Valid @RequestBody ChangeEmailRequest request) {
+                                            @Valid @RequestBody ChangeEmailRequestDto request) {
         log.info("Request received: PUT /api/users/{}/email - Change email", id);
         userService.updateEmailAddress(id, request);
 
@@ -80,7 +80,7 @@ public class UserController {
 
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(@PathVariable Integer id,
-                                               @Valid @RequestBody ChangePasswordRequest request) {
+                                               @Valid @RequestBody ChangePasswordRequestDto request) {
         log.info("Request received: PUT /api/users/{}/password - Change password", id);
         userService.updatePassword(id, request);
 
@@ -90,7 +90,7 @@ public class UserController {
 
     @PutMapping("/{id}/phone")
     public ResponseEntity<Void> changePhoneNumber(@PathVariable Integer id,
-                                                  @Valid @RequestBody ChangePhoneNumberRequest request) {
+                                                  @Valid @RequestBody ChangePhoneNumberRequestDto request) {
         log.info("Request received: PUT /api/users/{}/phone - Change phone", id);
         userService.updatePhoneNumber(id, request);
 
@@ -100,7 +100,7 @@ public class UserController {
 
     @PutMapping("/{id}/name")
     public ResponseEntity<Void> changeName(@PathVariable Integer id,
-                                           @Valid @RequestBody ChangeNameRequest request) {
+                                           @Valid @RequestBody UpdateNameRequestDto request) {
         log.info("Request received: PUT /api/users/{}/name - Change name", id);
         userService.updateName(id, request);
 

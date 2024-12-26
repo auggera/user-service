@@ -12,7 +12,7 @@ import ua.lastbite.userservice.validation.ValidPhoneNumber;
 @Setter
 @ValidPhoneNumber
 @EqualsAndHashCode
-public class ChangePhoneNumberRequest {
+public class ChangePhoneNumberRequestDto {
 
     @NotNull(message = "Country code is required")
     private CountryCode countryCode;

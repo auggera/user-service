@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.lastbite.userservice.dto.email.UserEmailInfo;
+import ua.lastbite.userservice.dto.email.EmailInfoResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
@@ -34,7 +34,7 @@ public class UserService {
         this.registrationMapper = registrationMapper;
     }
 
-    public UserResponseDto register(UserRegistrationRequest request) {
+    public UserResponseDto register(UserRegistrationRequestDto request) {
         checkIfEmailOrPhoneExists(request);
 
         User user = registrationMapper.toUser(request);
@@ -63,7 +63,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void updateEmailAddress(Integer id, ChangeEmailRequest request) {
+    public void updateEmailAddress(Integer id, ChangeEmailRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -83,7 +83,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePassword(Integer id, ChangePasswordRequest request) {
+    public void updatePassword(Integer id, ChangePasswordRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -103,7 +103,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePhoneNumber(Integer id, ChangePhoneNumberRequest request) {
+    public void updatePhoneNumber(Integer id, ChangePhoneNumberRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -127,7 +127,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updateName(Integer id, ChangeNameRequest request) {
+    public void updateName(Integer id, UpdateNameRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -151,7 +151,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    private void checkIfEmailOrPhoneExists(UserRegistrationRequest request) {
+    private void checkIfEmailOrPhoneExists(UserRegistrationRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
@@ -161,10 +161,10 @@ public class UserService {
         }
     }
 
-    public UserEmailInfo getUserEmailInfo(Integer userId) {
+    public EmailInfoResponseDto getUserEmailInfo(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return new UserEmailInfo(user.getEmail(), user.isEmailVerified());
+        return new EmailInfoResponseDto(user.getEmail(), user.isEmailVerified());
     }
 }

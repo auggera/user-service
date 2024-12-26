@@ -12,7 +12,7 @@ import ua.lastbite.userservice.validation.*;
 @Getter
 @EqualsAndHashCode
 @ValidPhoneNumber
-public class UserRegistrationRequest {
+public class UserRegistrationRequestDto {
 
     @NotBlank(message = "First name cannot be empty")
     @ValidName

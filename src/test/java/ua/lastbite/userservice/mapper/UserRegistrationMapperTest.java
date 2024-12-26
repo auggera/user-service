@@ -3,7 +3,7 @@ package ua.lastbite.userservice.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import ua.lastbite.userservice.dto.user.UserRegistrationRequest;
+import ua.lastbite.userservice.dto.user.UserRegistrationRequestDto;
 import ua.lastbite.userservice.model.CountryCode;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
@@ -21,7 +21,7 @@ public class UserRegistrationMapperTest {
 
     @Test
     void testUserRegistrationMapper() {
-        UserRegistrationRequest request = new UserRegistrationRequest();
+        UserRegistrationRequestDto request = new UserRegistrationRequestDto();
         request.setFirstName("John");
         request.setLastName("Doe");
         request.setEmail("email@example.com");

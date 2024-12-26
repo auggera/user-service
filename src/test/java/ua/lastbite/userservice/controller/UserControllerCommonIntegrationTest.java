@@ -11,10 +11,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import ua.lastbite.userservice.dto.user.ChangeEmailRequest;
-import ua.lastbite.userservice.dto.user.ChangeNameRequest;
-import ua.lastbite.userservice.dto.user.ChangePasswordRequest;
-import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequest;
+import ua.lastbite.userservice.dto.user.ChangeEmailRequestDto;
+import ua.lastbite.userservice.dto.user.UpdateNameRequestDto;
+import ua.lastbite.userservice.dto.user.ChangePasswordRequestDto;
+import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequestDto;
 import ua.lastbite.userservice.model.CountryCode;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
@@ -50,10 +50,10 @@ public class UserControllerCommonIntegrationTest {
     }
 
     User existingUser;
-    ChangeEmailRequest changeEmailRequest;
-    ChangePasswordRequest changePasswordRequest;
-    ChangePhoneNumberRequest changePhoneNumberRequest;
-    ChangeNameRequest changeNameRequest;
+    ChangeEmailRequestDto changeEmailRequestDto;
+    ChangePasswordRequestDto changePasswordRequestDto;
+    ChangePhoneNumberRequestDto changePhoneNumberRequestDto;
+    UpdateNameRequestDto updateNameRequestDto;
 
     @BeforeEach
     void setUpUser() {
@@ -115,7 +115,7 @@ public class UserControllerCommonIntegrationTest {
 
     @BeforeEach
     void setUpChangeEmailRequest() {
-        changeEmailRequest = new ChangeEmailRequest("new@example.com");
+        changeEmailRequestDto = new ChangeEmailRequestDto("new@example.com");
     }
 
     @Test
@@ -124,53 +124,53 @@ public class UserControllerCommonIntegrationTest {
 
         mockMvc.perform(put("/api/users/1/email")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeEmailRequest)))
+                        .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         assertNotNull(updatedUser);
-        assertEquals(changeEmailRequest.getNewEmail(), updatedUser.getEmail());
+        assertEquals(changeEmailRequestDto.getNewEmail(), updatedUser.getEmail());
     }
 
     @Test
     void testChangeNewEmailIsNull() throws Exception {
-        changeEmailRequest.setNewEmail(null);
+        changeEmailRequestDto.setNewEmail(null);
 
         mockMvc.perform(put("/api/users/1/email")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeEmailRequest)))
+                        .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newEmail").value("New email cannot be empty"));
     }
 
     @Test
     void testChangeEmailInvalidEmail() throws Exception {
-        changeEmailRequest.setNewEmail("invalid@email..com");
+        changeEmailRequestDto.setNewEmail("invalid@email..com");
 
         mockMvc.perform(put("/api/users/1/email")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeEmailRequest)))
+                        .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newEmail").value("Invalid email format"));
     }
 
     @Test
     void testChangeEmailNotChanged() throws Exception {
-        changeEmailRequest.setNewEmail("jane@example.com");
+        changeEmailRequestDto.setNewEmail("jane@example.com");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/email")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeEmailRequest)))
+                        .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New email is the same as the current email"));
     }
 
     @BeforeEach
     void setUpChangePasswordRequest() {
-        changePasswordRequest = new ChangePasswordRequest();
-        changePasswordRequest.setCurrentPassword("password123");
-        changePasswordRequest.setNewPassword("newPassword123");
+        changePasswordRequestDto = new ChangePasswordRequestDto();
+        changePasswordRequestDto.setCurrentPassword("password123");
+        changePasswordRequestDto.setNewPassword("newPassword123");
     }
 
     @Test
@@ -179,79 +179,79 @@ public class UserControllerCommonIntegrationTest {
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         assertNotNull(updatedUser);
-        assertTrue(passwordEncoder.matches(changePasswordRequest.getNewPassword(), updatedUser.getPassword()));
+        assertTrue(passwordEncoder.matches(changePasswordRequestDto.getNewPassword(), updatedUser.getPassword()));
     }
 
     @Test
     void testChangePasswordNewPasswordIsNull() throws Exception {
-        changePasswordRequest.setNewPassword(null);
+        changePasswordRequestDto.setNewPassword(null);
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPassword").value("New password cannot be empty"));
     }
 
     @Test
     void testChangePasswordCurrentPasswordIsNull() throws Exception {
-        changePasswordRequest.setCurrentPassword(null);
+        changePasswordRequestDto.setCurrentPassword(null);
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.currentPassword").value("Current password cannot be empty"));
     }
 
     @Test
     void testChangePasswordIncorrectCurrentPassword() throws Exception {
-        changePasswordRequest.setCurrentPassword("invalid");
+        changePasswordRequestDto.setCurrentPassword("invalid");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Current password is incorrect"));
     }
 
     @Test
     void testChangePasswordInvalidNewPassword() throws Exception {
-        changePasswordRequest.setNewPassword("invalid");
+        changePasswordRequestDto.setNewPassword("invalid");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPassword").value("Password must be at least 8 characters long and contain at least one letter and one number"));
     }
 
     @Test
     void testChangePasswordNotChanged() throws Exception {
-        changePasswordRequest.setNewPassword("password123");
+        changePasswordRequestDto.setNewPassword("password123");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/password")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequest)))
+                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New password cannot be the same as the current password"));
     }
 
     @BeforeEach
     void setUpChangePhoneNumberRequest() {
-        changePhoneNumberRequest = new ChangePhoneNumberRequest();
-        changePhoneNumberRequest.setCountryCode(CountryCode.UA);
-        changePhoneNumberRequest.setNewPhoneNumber("123456789");
+        changePhoneNumberRequestDto = new ChangePhoneNumberRequestDto();
+        changePhoneNumberRequestDto.setCountryCode(CountryCode.UA);
+        changePhoneNumberRequestDto.setNewPhoneNumber("123456789");
     }
 
     @Test
@@ -260,91 +260,91 @@ public class UserControllerCommonIntegrationTest {
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         assertNotNull(updatedUser);
-        assertEquals(changePhoneNumberRequest.getNewPhoneNumber(), updatedUser.getPhoneNumber());
+        assertEquals(changePhoneNumberRequestDto.getNewPhoneNumber(), updatedUser.getPhoneNumber());
     }
 
     @Test
     void testChangePhoneNumberInvalidPhoneNumber() throws Exception {
-        changePhoneNumberRequest.setNewPhoneNumber("abc123456");
+        changePhoneNumberRequestDto.setNewPhoneNumber("abc123456");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testChangePhoneNumberIsNull() throws Exception {
-        changePhoneNumberRequest.setNewPhoneNumber(null);
+        changePhoneNumberRequestDto.setNewPhoneNumber(null);
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPhoneNumber").value("Phone number cannot be empty"));
     }
 
     @Test
     void testChangePhoneNumberCountryCodeIsNull() throws Exception {
-        changePhoneNumberRequest.setCountryCode(null);
+        changePhoneNumberRequestDto.setCountryCode(null);
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.countryCode").value("Country code is required"));
     }
 
     @Test
     void testChangePhoneNumberTooLong() throws Exception {
-        changePhoneNumberRequest.setNewPhoneNumber("12345678901234");
+        changePhoneNumberRequestDto.setNewPhoneNumber("12345678901234");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testChangePhoneNumberTooShort() throws Exception {
-        changePhoneNumberRequest.setNewPhoneNumber("12345");
+        changePhoneNumberRequestDto.setNewPhoneNumber("12345");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testChangePhoneNumberNotChanged() throws Exception {
-        changePhoneNumberRequest.setNewPhoneNumber("987654321");
+        changePhoneNumberRequestDto.setNewPhoneNumber("987654321");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/phone")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequest)))
+                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New phone number cannot be the same as the current phone number"));
     }
 
     @BeforeEach
     void setUpChangeNameRequest() {
-        changeNameRequest = new ChangeNameRequest();
-        changeNameRequest.setFirstName("John");
-        changeNameRequest.setLastName("Jackson");
+        updateNameRequestDto = new UpdateNameRequestDto();
+        updateNameRequestDto.setFirstName("John");
+        updateNameRequestDto.setLastName("Jackson");
     }
 
     @Test
@@ -353,47 +353,47 @@ public class UserControllerCommonIntegrationTest {
 
         mockMvc.perform(put("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeNameRequest)))
+                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         assertNotNull(updatedUser);
-        assertEquals(changeNameRequest.getFirstName(), updatedUser.getFirstName());
-        assertEquals(changeNameRequest.getLastName(), updatedUser.getLastName());
+        assertEquals(updateNameRequestDto.getFirstName(), updatedUser.getFirstName());
+        assertEquals(updateNameRequestDto.getLastName(), updatedUser.getLastName());
     }
 
     @Test
     void testChangeNameShortFirstName() throws Exception {
-        changeNameRequest.setFirstName("J");
+        updateNameRequestDto.setFirstName("J");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeNameRequest)))
+                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("First name must be between 2 and 100 characters"));
     }
 
     @Test
     void testChangeNameLastNameIsNull() throws Exception {
-        changeNameRequest.setLastName(null);
+        updateNameRequestDto.setLastName(null);
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeNameRequest)))
+                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.lastName").value("Last name cannot be empty"));
     }
 
     @Test
     void testChangeNameInvalidFirstName() throws Exception {
-        changeNameRequest.setFirstName("1234Name");
+        updateNameRequestDto.setFirstName("1234Name");
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeNameRequest)))
+                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("Invalid name format"));
     }
@@ -402,12 +402,12 @@ public class UserControllerCommonIntegrationTest {
     void testChangeNameNotChanged() throws Exception {
         userRepository.save(existingUser);
 
-        changeNameRequest.setFirstName("Jane");
-        changeNameRequest.setLastName("Doe");
+        updateNameRequestDto.setFirstName("Jane");
+        updateNameRequestDto.setLastName("Doe");
 
         mockMvc.perform(put("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeNameRequest)))
+                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("No changes to first or last name were made"));
     }

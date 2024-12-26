@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import ua.lastbite.userservice.dto.user.UserRegistrationRequest;
+import ua.lastbite.userservice.dto.user.UserRegistrationRequestDto;
 import ua.lastbite.userservice.model.CountryCode;
 import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
@@ -43,7 +43,7 @@ public class UserControllerRegistrationIntegrationTest {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    UserRegistrationRequest userRegistrationRequest;
+    UserRegistrationRequestDto userRegistrationRequestDto;
     User existingUser;
 
     @BeforeEach
@@ -53,14 +53,14 @@ public class UserControllerRegistrationIntegrationTest {
 
     @BeforeEach
     void setUpUserRegistrationRequest() {
-        userRegistrationRequest = new UserRegistrationRequest();
-        userRegistrationRequest.setFirstName("John");
-        userRegistrationRequest.setLastName("Doe");
-        userRegistrationRequest.setEmail("john@example.com");
-        userRegistrationRequest.setPassword("password123");
-        userRegistrationRequest.setCountryCode(CountryCode.UA);
-        userRegistrationRequest.setPhoneNumber("123456789");
-        userRegistrationRequest.setRole(UserRole.CUSTOMER);
+        userRegistrationRequestDto = new UserRegistrationRequestDto();
+        userRegistrationRequestDto.setFirstName("John");
+        userRegistrationRequestDto.setLastName("Doe");
+        userRegistrationRequestDto.setEmail("john@example.com");
+        userRegistrationRequestDto.setPassword("password123");
+        userRegistrationRequestDto.setCountryCode(CountryCode.UA);
+        userRegistrationRequestDto.setPhoneNumber("123456789");
+        userRegistrationRequestDto.setRole(UserRole.CUSTOMER);
 
         existingUser = new User();
         existingUser.setId(1);
@@ -77,7 +77,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserSuccessfully() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
@@ -91,11 +91,11 @@ public class UserControllerRegistrationIntegrationTest {
 
     @Test
     void testRegisterUserWithInvalidEmail() throws Exception {
-        userRegistrationRequest.setEmail("invalidEmail");
+        userRegistrationRequestDto.setEmail("invalidEmail");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Invalid email format"));
     }
@@ -107,18 +107,18 @@ public class UserControllerRegistrationIntegrationTest {
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Email " + existingUser.getEmail() + " is already in use"));
     }
 
     @Test
     void testRegisterUserWithEmptyEmail() throws Exception {
-        userRegistrationRequest.setEmail(null);
+        userRegistrationRequestDto.setEmail(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Email cannot be empty"));
     }
@@ -130,139 +130,139 @@ public class UserControllerRegistrationIntegrationTest {
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Phone number " + userRegistrationRequest.getPhoneNumber() + " is already in use"));
+                .andExpect(content().string("Phone number " + userRegistrationRequestDto.getPhoneNumber() + " is already in use"));
     }
 
     @Test
     void testRegisterUserPhoneNumberTooLong() throws Exception {
-        userRegistrationRequest.setPhoneNumber("123456789000");
+        userRegistrationRequestDto.setPhoneNumber("123456789000");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testRegisterUserPhoneNumberTooShort() throws Exception {
-        userRegistrationRequest.setPhoneNumber("12345");
+        userRegistrationRequestDto.setPhoneNumber("12345");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testRegisterUserWithInvalidPhoneNumberFormat() throws Exception {
-        userRegistrationRequest.setPhoneNumber("312#-invalid");
+        userRegistrationRequestDto.setPhoneNumber("312#-invalid");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
     }
 
     @Test
     void testRegisterUserWithEmptyPhoneNumber() throws Exception {
-        userRegistrationRequest.setPhoneNumber(null);
+        userRegistrationRequestDto.setPhoneNumber(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.phoneNumber").value("Phone number cannot be empty"));
     }
 
     @Test
     void testRegisterUserWithShortName() throws Exception {
-        userRegistrationRequest.setFirstName("B");
+        userRegistrationRequestDto.setFirstName("B");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("First name must be between 2 and 100 characters"));
     }
 
     @Test
     void testRegisterUserWithEmptyName() throws Exception {
-        userRegistrationRequest.setFirstName(null);
+        userRegistrationRequestDto.setFirstName(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.firstName").value("First name cannot be empty"));
     }
 
     @Test
     void testRegisterUserWithInvalidLastNameFormat() throws Exception {
-        userRegistrationRequest.setLastName("Doe13");
+        userRegistrationRequestDto.setLastName("Doe13");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.lastName").value("Invalid name format"));
     }
 
     @Test
     void testRegisterUserWithEmptyPassword() throws Exception {
-        userRegistrationRequest.setPassword(null);
+        userRegistrationRequestDto.setPassword(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.password").value("Password cannot be empty"));
     }
 
     @Test
     void testRegisterUserWithShortPassword() throws Exception {
-        userRegistrationRequest.setPassword("short1");
+        userRegistrationRequestDto.setPassword("short1");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.password").value("Password must be at least 8 characters long and contain at least one letter and one number"));
     }
 
     @Test
     void testRegisterUserWithEmptyCountryCode() throws Exception {
-        userRegistrationRequest.setCountryCode(null);
+        userRegistrationRequestDto.setCountryCode(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.countryCode").value("Country code is required"));
     }
 
     @Test
     void testRegisterUserWithNoNumbersPassword() throws Exception {
-        userRegistrationRequest.setPassword("password");
+        userRegistrationRequestDto.setPassword("password");
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.password").value("Password must be at least 8 characters long and contain at least one letter and one number"));
     }
 
     @Test
     void testRegisterUserWithEmptyRole() throws Exception {
-        userRegistrationRequest.setRole(null);
+        userRegistrationRequestDto.setRole(null);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.role").value("Role is required"));
     }

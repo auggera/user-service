@@ -9,7 +9,7 @@ import ua.lastbite.userservice.validation.ValidEmail;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class ChangeEmailRequest {
+public class ChangeEmailRequestDto {
 
     @NotBlank(message = "New email cannot be empty")
     @ValidEmail

@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import ua.lastbite.userservice.dto.email.UserEmailInfo;
+import ua.lastbite.userservice.dto.email.EmailInfoResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.model.CountryCode;
@@ -43,24 +43,24 @@ public class UserControllerTest {
     private ObjectMapper objectMapper;
 
 
-    UserRegistrationRequest userRegistrationRequest;
+    UserRegistrationRequestDto userRegistrationRequestDto;
     UserResponseDto userResponseDto;
-    ChangeEmailRequest changeEmailRequest;
-    ChangePasswordRequest changePasswordRequest;
-    ChangePhoneNumberRequest changePhoneNumberRequest;
-    ChangeNameRequest changeNameRequest;
-    UserEmailInfo userEmailInfo;
+    ChangeEmailRequestDto changeEmailRequestDto;
+    ChangePasswordRequestDto changePasswordRequestDto;
+    ChangePhoneNumberRequestDto changePhoneNumberRequestDto;
+    UpdateNameRequestDto updateNameRequestDto;
+    EmailInfoResponseDto emailInfoResponseDto;
 
     @BeforeEach
     void setUpUserRegistrationRequest() {
-        userRegistrationRequest = new UserRegistrationRequest();
-        userRegistrationRequest.setFirstName("John");
-        userRegistrationRequest.setLastName("Doe");
-        userRegistrationRequest.setEmail("john@example.com");
-        userRegistrationRequest.setPassword("password123");
-        userRegistrationRequest.setCountryCode(CountryCode.UA);
-        userRegistrationRequest.setPhoneNumber("123456789");
-        userRegistrationRequest.setRole(UserRole.CUSTOMER);
+        userRegistrationRequestDto = new UserRegistrationRequestDto();
+        userRegistrationRequestDto.setFirstName("John");
+        userRegistrationRequestDto.setLastName("Doe");
+        userRegistrationRequestDto.setEmail("john@example.com");
+        userRegistrationRequestDto.setPassword("password123");
+        userRegistrationRequestDto.setCountryCode(CountryCode.UA);
+        userRegistrationRequestDto.setPhoneNumber("123456789");
+        userRegistrationRequestDto.setRole(UserRole.CUSTOMER);
 
         userResponseDto = new UserResponseDto();
         userResponseDto.setId(1);
@@ -72,12 +72,12 @@ public class UserControllerTest {
 
     @Test
     void testRegisterUserSuccessfully() throws Exception {
-        Mockito.when(userService.register(userRegistrationRequest))
+        Mockito.when(userService.register(userRegistrationRequestDto))
                 .thenReturn(userResponseDto);
 
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userRegistrationRequest)))
+                .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstName").value("John"))
@@ -89,26 +89,26 @@ public class UserControllerTest {
 
     @Test
     void testRegisterUserEmailAlreadyExistException() throws Exception {
-        Mockito.doThrow(new EmailAlreadyExistsException(userRegistrationRequest.getEmail()))
-                .when(userService).register(userRegistrationRequest);
+        Mockito.doThrow(new EmailAlreadyExistsException(userRegistrationRequestDto.getEmail()))
+                .when(userService).register(userRegistrationRequestDto);
 
         mockMvc.perform(post("/api/users")
-                .content(objectMapper.writeValueAsString(userRegistrationRequest))
+                .content(objectMapper.writeValueAsString(userRegistrationRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Email " + userRegistrationRequest.getEmail() + " is already in use"));
+                .andExpect(content().string("Email " + userRegistrationRequestDto.getEmail() + " is already in use"));
     }
 
     @Test
     void testRegisterUserPhoneNumberAlreadyExistException() throws Exception {
-        Mockito.doThrow(new PhoneNumberAlreadyExistsException(userRegistrationRequest.getPhoneNumber()))
-                .when(userService).register(userRegistrationRequest);
+        Mockito.doThrow(new PhoneNumberAlreadyExistsException(userRegistrationRequestDto.getPhoneNumber()))
+                .when(userService).register(userRegistrationRequestDto);
 
         mockMvc.perform(post("/api/users")
-                .content(objectMapper.writeValueAsString(userRegistrationRequest))
+                .content(objectMapper.writeValueAsString(userRegistrationRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Phone number " + userRegistrationRequest.getPhoneNumber() + " is already in use"));
+                .andExpect(content().string("Phone number " + userRegistrationRequestDto.getPhoneNumber() + " is already in use"));
     }
 
     @Test
@@ -159,14 +159,14 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUpChangeEmailRequest() {
-        changeEmailRequest = new ChangeEmailRequest();
-        changeEmailRequest.setNewEmail("new@example.com");
+        changeEmailRequestDto = new ChangeEmailRequestDto();
+        changeEmailRequestDto.setNewEmail("new@example.com");
     }
 
     @Test
     void testChangeEmailSuccessfully() throws Exception {
         mockMvc.perform(put("/api/users/1/email")
-            .content(objectMapper.writeValueAsString(changeEmailRequest))
+            .content(objectMapper.writeValueAsString(changeEmailRequestDto))
             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -174,10 +174,10 @@ public class UserControllerTest {
     @Test
     void testChangeEmailUserNotFoundException() throws Exception {
         Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updateEmailAddress(1, changeEmailRequest);
+                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
 
         mockMvc.perform(put("/api/users/1/email")
-                .content(objectMapper.writeValueAsString(changeEmailRequest))
+                .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
@@ -186,10 +186,10 @@ public class UserControllerTest {
     @Test
     void testChangeEmailAddressNotChangedException() throws Exception {
         Mockito.doThrow(new EmailAddressNotChangedException())
-                .when(userService).updateEmailAddress(1, changeEmailRequest);
+                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
 
         mockMvc.perform(put("/api/users/1/email")
-                .content(objectMapper.writeValueAsString(changeEmailRequest))
+                .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New email is the same as the current email"));
@@ -197,27 +197,27 @@ public class UserControllerTest {
 
     @Test
     void testChangeEmailAddressAlreadyExistException() throws Exception {
-        Mockito.doThrow(new EmailAlreadyExistsException(changeEmailRequest.getNewEmail()))
-                .when(userService).updateEmailAddress(1, changeEmailRequest);
+        Mockito.doThrow(new EmailAlreadyExistsException(changeEmailRequestDto.getNewEmail()))
+                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
 
         mockMvc.perform(put("/api/users/1/email")
-                .content(objectMapper.writeValueAsString(changeEmailRequest))
+                .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Email " + changeEmailRequest.getNewEmail() + " is already in use"));
+                .andExpect(content().string("Email " + changeEmailRequestDto.getNewEmail() + " is already in use"));
     }
 
     @BeforeEach
     void setUpChangePasswordRequest() {
-        changePasswordRequest = new ChangePasswordRequest();
-        changePasswordRequest.setCurrentPassword("currentPassword123");
-        changePasswordRequest.setNewPassword("newPassword123");
+        changePasswordRequestDto = new ChangePasswordRequestDto();
+        changePasswordRequestDto.setCurrentPassword("currentPassword123");
+        changePasswordRequestDto.setNewPassword("newPassword123");
     }
 
     @Test
     void testChangePasswordSuccessfully() throws Exception {
         mockMvc.perform(put("/api/users/1/password")
-                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -225,10 +225,10 @@ public class UserControllerTest {
     @Test
     void testChangePasswordUserNotFoundException() throws Exception {
         Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updatePassword(1, changePasswordRequest);
+                .when(userService).updatePassword(1, changePasswordRequestDto);
 
         mockMvc.perform(put("/api/users/1/password")
-                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
@@ -237,10 +237,10 @@ public class UserControllerTest {
     @Test
     void testChangePasswordIncorrectCurrentPasswordException() throws Exception {
         Mockito.doThrow(new IncorrectCurrentPasswordException())
-                .when(userService).updatePassword(1, changePasswordRequest);
+                .when(userService).updatePassword(1, changePasswordRequestDto);
 
         mockMvc.perform(put("/api/users/1/password" )
-                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Current password is incorrect"));
@@ -249,10 +249,10 @@ public class UserControllerTest {
     @Test
     void testChangePasswordNotChangedException() throws Exception {
         Mockito.doThrow(new PasswordNotChangedException())
-                .when(userService).updatePassword(1, changePasswordRequest);
+                .when(userService).updatePassword(1, changePasswordRequestDto);
 
         mockMvc.perform(put("/api/users/1/password")
-                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New password cannot be the same as the current password"));
@@ -260,15 +260,15 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUpChangePhoneNumberRequest() {
-        changePhoneNumberRequest = new ChangePhoneNumberRequest();
-        changePhoneNumberRequest.setCountryCode(CountryCode.UA);
-        changePhoneNumberRequest.setNewPhoneNumber("987654321");
+        changePhoneNumberRequestDto = new ChangePhoneNumberRequestDto();
+        changePhoneNumberRequestDto.setCountryCode(CountryCode.UA);
+        changePhoneNumberRequestDto.setNewPhoneNumber("987654321");
     }
 
     @Test
     void testChangePhoneNumberSuccessfully() throws Exception {
         mockMvc.perform(put("/api/users/1/phone")
-                .content(objectMapper.writeValueAsString(changePhoneNumberRequest))
+                .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -276,10 +276,10 @@ public class UserControllerTest {
     @Test
     void testChangePhoneNumberUserNotFoundException() throws Exception {
         Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updatePhoneNumber(1, changePhoneNumberRequest);
+                .when(userService).updatePhoneNumber(1, changePhoneNumberRequestDto);
 
         mockMvc.perform(put("/api/users/1/phone")
-                .content(objectMapper.writeValueAsString(changePhoneNumberRequest))
+                .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
@@ -288,10 +288,10 @@ public class UserControllerTest {
     @Test
     void testChangePhoneNumberNotChangedException() throws Exception {
         Mockito.doThrow(new PhoneNumberNotChangedException())
-                .when(userService).updatePhoneNumber(1, changePhoneNumberRequest);
+                .when(userService).updatePhoneNumber(1, changePhoneNumberRequestDto);
 
         mockMvc.perform(put("/api/users/1/phone")
-                .content(objectMapper.writeValueAsString(changePhoneNumberRequest))
+                .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("New phone number cannot be the same as the current phone number"));
@@ -299,15 +299,15 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUpChangeNameRequest() {
-        changeNameRequest = new ChangeNameRequest();
-        changeNameRequest.setFirstName("Davis");
-        changeNameRequest.setLastName("Deutsch");
+        updateNameRequestDto = new UpdateNameRequestDto();
+        updateNameRequestDto.setFirstName("Davis");
+        updateNameRequestDto.setLastName("Deutsch");
     }
 
     @Test
     void testChangeNameSuccessfully() throws Exception {
         mockMvc.perform(put("/api/users/1/name")
-                .content(objectMapper.writeValueAsString(changeNameRequest))
+                .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -315,10 +315,10 @@ public class UserControllerTest {
     @Test
     void testChangeNameUserNotFoundException() throws Exception {
         Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updateName(1, changeNameRequest);
+                .when(userService).updateName(1, updateNameRequestDto);
 
         mockMvc.perform(put("/api/users/1/name")
-                .content(objectMapper.writeValueAsString(changeNameRequest))
+                .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
@@ -327,10 +327,10 @@ public class UserControllerTest {
     @Test
     void testChangeNameNotChangedException() throws Exception {
         Mockito.doThrow(new NameNotChangedException())
-                .when(userService).updateName(1, changeNameRequest);
+                .when(userService).updateName(1, updateNameRequestDto);
 
         mockMvc.perform(put("/api/users/1/name")
-                .content(objectMapper.writeValueAsString(changeNameRequest))
+                .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("No changes to first or last name were made"));
@@ -354,9 +354,9 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        userEmailInfo = new UserEmailInfo();
-        userEmailInfo.setEmail("email@example.com");
-        userEmailInfo.setVerified(false);
+        emailInfoResponseDto = new EmailInfoResponseDto();
+        emailInfoResponseDto.setEmail("email@example.com");
+        emailInfoResponseDto.setVerified(false);
     }
 
     @Test
@@ -364,7 +364,7 @@ public class UserControllerTest {
         int userId = 1;
 
         Mockito.when(userService.getUserEmailInfo(userId))
-                .thenReturn(userEmailInfo);
+                .thenReturn(emailInfoResponseDto);
 
         mockMvc.perform(get("/api/users/{id}/email-info", userId))
                 .andExpect(status().isOk())

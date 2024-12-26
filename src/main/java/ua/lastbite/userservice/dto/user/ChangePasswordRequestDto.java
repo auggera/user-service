@@ -9,7 +9,7 @@ import ua.lastbite.userservice.validation.ValidPassword;
 @Setter
 @Getter
 @EqualsAndHashCode
-public class ChangePasswordRequest {
+public class ChangePasswordRequestDto {
 
     @NotBlank(message = "Current password cannot be empty")
     private String currentPassword;

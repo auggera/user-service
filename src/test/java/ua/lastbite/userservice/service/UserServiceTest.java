@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import ua.lastbite.userservice.dto.email.UserEmailInfo;
+import ua.lastbite.userservice.dto.email.EmailInfoResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
@@ -50,7 +50,7 @@ public class UserServiceTest {
     @Test
     void testRegisterSuccessful() {
 
-        UserRegistrationRequest request = new UserRegistrationRequest();
+        UserRegistrationRequestDto request = new UserRegistrationRequestDto();
         request.setFirstName("Firstname");
         request.setLastName("Lastname");
         request.setEmail("test@example.com");
@@ -93,7 +93,7 @@ public class UserServiceTest {
     @Test
     void testRegisterDuplicateEmail() {
 
-        UserRegistrationRequest request = new UserRegistrationRequest();
+        UserRegistrationRequestDto request = new UserRegistrationRequestDto();
         request.setFirstName("Firstname");
         request.setLastName("Lastname");
         request.setEmail("test@example.com");
@@ -113,7 +113,7 @@ public class UserServiceTest {
 
     @Test
     void testRegisterDuplicatePhoneNumber() {
-        UserRegistrationRequest request = new UserRegistrationRequest();
+        UserRegistrationRequestDto request = new UserRegistrationRequestDto();
         request.setFirstName("Firstname");
         request.setLastName("Lastname");
         request.setEmail("test@example.com");
@@ -234,7 +234,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateEmailAddressSuccessfully() {
-        ChangeEmailRequest request = new ChangeEmailRequest();
+        ChangeEmailRequestDto request = new ChangeEmailRequestDto();
         request.setNewEmail("new@example.com");
 
         User existingUser = new User();
@@ -256,7 +256,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateEmailAddressUserNotFound() {
-        ChangeEmailRequest request = new ChangeEmailRequest();
+        ChangeEmailRequestDto request = new ChangeEmailRequestDto();
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
@@ -270,7 +270,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateEmailAddressNotChanged() {
-        ChangeEmailRequest request = new ChangeEmailRequest();
+        ChangeEmailRequestDto request = new ChangeEmailRequestDto();
         request.setNewEmail("test@example.com");
 
         User existingUser = new User();
@@ -291,7 +291,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateEmailAddressAlreadyExists() {
-        ChangeEmailRequest request = new ChangeEmailRequest();
+        ChangeEmailRequestDto request = new ChangeEmailRequestDto();
         request.setNewEmail("new@example.com");
 
         User existingUser = new User();
@@ -318,7 +318,7 @@ public class UserServiceTest {
 
     @Test
     void updatePasswordSuccessfully() {
-        ChangePasswordRequest request = new ChangePasswordRequest();
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto();
         request.setCurrentPassword("currentPassword");
         request.setNewPassword("newPassword");
 
@@ -342,7 +342,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePasswordUserNotFound() {
-        ChangePasswordRequest request = new ChangePasswordRequest();
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto();
 
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
 
@@ -357,7 +357,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePasswordIncorrectCurrentPassword() {
-        ChangePasswordRequest request = new ChangePasswordRequest();
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto();
         request.setCurrentPassword("incorrectPassword");
         request.setNewPassword("newPassword");
 
@@ -380,7 +380,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePasswordNotChanged() {
-        ChangePasswordRequest request = new ChangePasswordRequest();
+        ChangePasswordRequestDto request = new ChangePasswordRequestDto();
         request.setCurrentPassword("currentPassword");
         request.setNewPassword("currentPassword");
 
@@ -403,7 +403,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePhoneNumberSuccessfully() {
-        ChangePhoneNumberRequest request = new ChangePhoneNumberRequest();
+        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto();
         request.setCountryCode(CountryCode.UA);
         request.setNewPhoneNumber("987654321");
 
@@ -426,7 +426,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePhoneNumberUserNotFound() {
-        ChangePhoneNumberRequest request = new ChangePhoneNumberRequest();
+        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto();
 
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
 
@@ -441,7 +441,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePhoneNumberNotChanged() {
-        ChangePhoneNumberRequest request = new ChangePhoneNumberRequest();
+        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto();
         request.setCountryCode(CountryCode.UA);
         request.setNewPhoneNumber("123456789");
 
@@ -465,7 +465,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePhoneNumberAlreadyExist() {
-        ChangePhoneNumberRequest request = new ChangePhoneNumberRequest();
+        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto();
         request.setCountryCode(CountryCode.UA);
         request.setNewPhoneNumber("987654321");
 
@@ -495,7 +495,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateNameSuccessfully() {
-        ChangeNameRequest request = new ChangeNameRequest();
+        UpdateNameRequestDto request = new UpdateNameRequestDto();
         request.setFirstName("Firstname");
         request.setLastName("LastName");
 
@@ -518,7 +518,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateNameUserNotFound() {
-        ChangeNameRequest request = new ChangeNameRequest();
+        UpdateNameRequestDto request = new UpdateNameRequestDto();
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
 
         UserNotFoundException e = assertThrows(UserNotFoundException.class,
@@ -532,7 +532,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateNameNotChanged() {
-        ChangeNameRequest request = new ChangeNameRequest();
+        UpdateNameRequestDto request = new UpdateNameRequestDto();
         request.setFirstName("Firstname");
         request.setLastName("LastName");
 
@@ -564,7 +564,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId))
                 .thenReturn(Optional.of(user));
 
-        UserEmailInfo response = userService.getUserEmailInfo(userId);
+        EmailInfoResponseDto response = userService.getUserEmailInfo(userId);
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
 
