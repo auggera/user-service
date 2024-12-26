@@ -73,7 +73,7 @@ public class UserControllerTest {
         Mockito.when(userService.register(userRegistrationRequest))
                 .thenReturn(userResponseDto);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isCreated())
@@ -90,7 +90,7 @@ public class UserControllerTest {
         Mockito.doThrow(new EmailAlreadyExistsException(userRegistrationRequest.getEmail()))
                 .when(userService).register(userRegistrationRequest);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                 .content(objectMapper.writeValueAsString(userRegistrationRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -102,7 +102,7 @@ public class UserControllerTest {
         Mockito.doThrow(new PhoneNumberAlreadyExistsException(userRegistrationRequest.getPhoneNumber()))
                 .when(userService).register(userRegistrationRequest);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                 .content(objectMapper.writeValueAsString(userRegistrationRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())

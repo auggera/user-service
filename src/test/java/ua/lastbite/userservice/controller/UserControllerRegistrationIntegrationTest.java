@@ -75,7 +75,7 @@ public class UserControllerRegistrationIntegrationTest {
 
     @Test
     void testRegisterUserSuccessfully() throws Exception {
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isCreated())
@@ -93,7 +93,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithInvalidEmail() throws Exception {
         userRegistrationRequest.setEmail("invalidEmail");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -105,7 +105,7 @@ public class UserControllerRegistrationIntegrationTest {
         existingUser.setEmail("john@example.com");
         userRepository.save(existingUser);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -116,7 +116,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyEmail() throws Exception {
         userRegistrationRequest.setEmail(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -128,7 +128,7 @@ public class UserControllerRegistrationIntegrationTest {
         existingUser.setPhoneNumber("123456789");
         userRepository.save(existingUser);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -139,7 +139,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserPhoneNumberTooLong() throws Exception {
         userRegistrationRequest.setPhoneNumber("123456789000");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -150,7 +150,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserPhoneNumberTooShort() throws Exception {
         userRegistrationRequest.setPhoneNumber("12345");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -161,7 +161,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithInvalidPhoneNumberFormat() throws Exception {
         userRegistrationRequest.setPhoneNumber("312#-invalid");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -172,7 +172,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyPhoneNumber() throws Exception {
         userRegistrationRequest.setPhoneNumber(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -183,7 +183,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithShortName() throws Exception {
         userRegistrationRequest.setFirstName("B");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -194,7 +194,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyName() throws Exception {
         userRegistrationRequest.setFirstName(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -205,7 +205,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithInvalidLastNameFormat() throws Exception {
         userRegistrationRequest.setLastName("Doe13");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -216,7 +216,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyPassword() throws Exception {
         userRegistrationRequest.setPassword(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -227,7 +227,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithShortPassword() throws Exception {
         userRegistrationRequest.setPassword("short1");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -238,7 +238,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyCountryCode() throws Exception {
         userRegistrationRequest.setCountryCode(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -249,7 +249,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithNoNumbersPassword() throws Exception {
         userRegistrationRequest.setPassword("password");
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
@@ -260,7 +260,7 @@ public class UserControllerRegistrationIntegrationTest {
     void testRegisterUserWithEmptyRole() throws Exception {
         userRegistrationRequest.setRole(null);
 
-        mockMvc.perform(post("/api/users/register")
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequest)))
                 .andExpect(status().isBadRequest())
