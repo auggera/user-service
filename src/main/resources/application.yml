@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: ${USER_SERVICE_DATABASE_URL}
+    username: ${USER_SERVICE_DATABASE_USERNAME}
+    password: ${USER_SERVICE_DATABASE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+server:
+  port: 8080

@@ -35,6 +35,4 @@ build/
 /target
 *.log
 *.jar
-application.yml
-application-test.yml
 
