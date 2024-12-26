@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
+import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
@@ -549,5 +550,40 @@ public class UserServiceTest {
         assertNull(existingUser.getUpdatedAt());
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(1);
+    }
+
+    @Test
+    void testGetUserEmailInfoSuccessfully() {
+        int userId = 1;
+
+        User user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("email@example.com");
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        UserEmailResponseDto response = userService.getUserEmailInfo(userId);
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+
+        assertNotNull(response);
+        assertEquals(user.getEmail(), response.getEmail());
+        assertEquals(user.isEmailVerified(), response.isVerified());
+    }
+
+    @Test
+    void testGetUserEmailInfoUserNotFound() {
+        int userId = 1;
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.getUserEmailInfo(userId));
+
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+
+        assertEquals("User with ID 1 not found", exception.getMessage());
     }
 }

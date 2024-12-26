@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.model.CountryCode;
@@ -48,6 +49,7 @@ public class UserControllerTest {
     ChangePasswordRequest changePasswordRequest;
     ChangePhoneNumberRequest changePhoneNumberRequest;
     ChangeNameRequest changeNameRequest;
+    UserEmailResponseDto userEmailResponseDto;
 
     @BeforeEach
     void setUpUserRegistrationRequest() {
@@ -348,5 +350,37 @@ public class UserControllerTest {
         mockMvc.perform(delete("/api/users/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
+    }
+
+    @BeforeEach
+    void setUp() {
+        userEmailResponseDto = new UserEmailResponseDto();
+        userEmailResponseDto.setEmail("email@example.com");
+        userEmailResponseDto.setVerified(false);
+    }
+
+    @Test
+    void testGetUserEmailInfoSuccessfully() throws Exception {
+        int userId = 1;
+
+        Mockito.when(userService.getUserEmailInfo(userId))
+                .thenReturn(userEmailResponseDto);
+
+        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("email@example.com"))
+                .andExpect(jsonPath("$.verified").value(false));
+    }
+
+    @Test
+    void testGetUserEmailInfoUserNotFound() throws Exception {
+        int userId = 1;
+
+        Mockito.when(userService.getUserEmailInfo(userId))
+                .thenThrow(new UserNotFoundException(userId));
+
+        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with ID " + userId + " not found"));
     }
 }

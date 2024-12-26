@@ -428,4 +428,22 @@ public class UserControllerCommonIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID 1 not found"));
     }
+
+    @Test
+    void testGetUserEmailInfoSuccessfully() throws Exception {
+        User user = userRepository.save(existingUser);
+        int userId = user.getId();
+
+        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(existingUser.getEmail()))
+                .andExpect(jsonPath("$.verified").value(false));
+    }
+
+    @Test
+    void testGetUserEmailInfoUserNotFound() throws Exception {
+        mockMvc.perform(get("/api/users/1/email-info"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with ID 1 not found"));
+    }
 }

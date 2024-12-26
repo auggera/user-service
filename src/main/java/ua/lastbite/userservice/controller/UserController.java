@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.service.UserService;
 
@@ -49,6 +50,12 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{id}/email-info")
+    public ResponseEntity<UserEmailResponseDto> getUserEmailInfo(@PathVariable Integer id) {
+        UserEmailResponseDto userEmailResponseDto = userService.getUserEmailInfo(id);
+        return ResponseEntity.ok(userEmailResponseDto);
+    }
+
     @PutMapping("/{id}/email")
     public ResponseEntity<Void> changeEmail(@PathVariable Integer id,
                                             @Valid @RequestBody ChangeEmailRequest request) {
@@ -71,7 +78,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}/name")
-    public ResponseEntity<Void> changeName(@PathVariable Integer id, @Valid @RequestBody ChangeNameRequest request) {
+    public ResponseEntity<Void> changeName(@PathVariable Integer id,
+                                           @Valid @RequestBody ChangeNameRequest request) {
         userService.updateName(id, request);
         return ResponseEntity.noContent().build();
     }
