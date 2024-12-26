@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
+import ua.lastbite.userservice.dto.email.UserEmailInfo;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.model.CountryCode;
@@ -49,7 +49,7 @@ public class UserControllerTest {
     ChangePasswordRequest changePasswordRequest;
     ChangePhoneNumberRequest changePhoneNumberRequest;
     ChangeNameRequest changeNameRequest;
-    UserEmailResponseDto userEmailResponseDto;
+    UserEmailInfo userEmailInfo;
 
     @BeforeEach
     void setUpUserRegistrationRequest() {
@@ -354,9 +354,9 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        userEmailResponseDto = new UserEmailResponseDto();
-        userEmailResponseDto.setEmail("email@example.com");
-        userEmailResponseDto.setVerified(false);
+        userEmailInfo = new UserEmailInfo();
+        userEmailInfo.setEmail("email@example.com");
+        userEmailInfo.setVerified(false);
     }
 
     @Test
@@ -364,7 +364,7 @@ public class UserControllerTest {
         int userId = 1;
 
         Mockito.when(userService.getUserEmailInfo(userId))
-                .thenReturn(userEmailResponseDto);
+                .thenReturn(userEmailInfo);
 
         mockMvc.perform(get("/api/users/{id}/email-info", userId))
                 .andExpect(status().isOk())

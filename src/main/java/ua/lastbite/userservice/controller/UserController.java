@@ -2,14 +2,13 @@ package ua.lastbite.userservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
+import ua.lastbite.userservice.dto.email.UserEmailInfo;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.service.UserService;
 
@@ -51,9 +50,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/email-info")
-    public ResponseEntity<UserEmailResponseDto> getUserEmailInfo(@PathVariable Integer id) {
-        UserEmailResponseDto userEmailResponseDto = userService.getUserEmailInfo(id);
-        return ResponseEntity.ok(userEmailResponseDto);
+    public ResponseEntity<UserEmailInfo> getUserEmailInfo(@PathVariable Integer id) {
+        UserEmailInfo userEmailInfo = userService.getUserEmailInfo(id);
+        return ResponseEntity.ok(userEmailInfo);
     }
 
     @PutMapping("/{id}/email")

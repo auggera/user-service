@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
+import ua.lastbite.userservice.dto.email.UserEmailInfo;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
@@ -564,7 +564,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId))
                 .thenReturn(Optional.of(user));
 
-        UserEmailResponseDto response = userService.getUserEmailInfo(userId);
+        UserEmailInfo response = userService.getUserEmailInfo(userId);
 
         Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
 

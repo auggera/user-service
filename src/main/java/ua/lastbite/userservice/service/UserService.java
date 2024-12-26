@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.lastbite.userservice.dto.email.UserEmailResponseDto;
+import ua.lastbite.userservice.dto.email.UserEmailInfo;
 import ua.lastbite.userservice.dto.user.*;
 import ua.lastbite.userservice.exception.user.*;
 import ua.lastbite.userservice.mapper.UserResponseMapper ;
@@ -161,10 +161,10 @@ public class UserService {
         }
     }
 
-    public UserEmailResponseDto getUserEmailInfo(Integer userId) {
+    public UserEmailInfo getUserEmailInfo(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return new UserEmailResponseDto(user.getEmail(), user.isEmailVerified());
+        return new UserEmailInfo(user.getEmail(), user.isEmailVerified());
     }
 }
