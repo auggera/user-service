@@ -2,14 +2,14 @@ package ua.lastbite.userservice.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ua.lastbite.userservice.dto.user.UserRegistrationRequest;
+import ua.lastbite.userservice.dto.user.UserRegistrationRequestDto;
 
 public class UserRegistrationPhoneNumberValidator
         extends AbstractPhoneNumberValidator
-        implements ConstraintValidator<ValidPhoneNumber, UserRegistrationRequest> {
+        implements ConstraintValidator<ValidPhoneNumber, UserRegistrationRequestDto> {
 
     @Override
-    public boolean isValid(UserRegistrationRequest request, ConstraintValidatorContext context) {
+    public boolean isValid(UserRegistrationRequestDto request, ConstraintValidatorContext context) {
         if (request.getPhoneNumber() == null) {
             return true; // Let @NotBlank handle the case
         }
