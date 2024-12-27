@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = SizeValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CustomSize {
+public @interface ValidSize {
     String message() default "Invalid size";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
