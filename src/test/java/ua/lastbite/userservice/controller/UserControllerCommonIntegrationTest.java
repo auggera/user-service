@@ -351,7 +351,7 @@ public class UserControllerCommonIntegrationTest {
     void testUpdateName() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isNoContent());
@@ -367,7 +367,7 @@ public class UserControllerCommonIntegrationTest {
         updateNameRequestDto.setFirstName("J");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -375,23 +375,11 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testUpdateNameLastNameIsNull() throws Exception {
-        updateNameRequestDto.setLastName(null);
-        userRepository.save(existingUser);
-
-        mockMvc.perform(put("/api/users/1/name")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateNameRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.lastName").value("Last name cannot be empty"));
-    }
-
-    @Test
     void testUpdateNameInvalidFirstName() throws Exception {
         updateNameRequestDto.setFirstName("1234Name");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -405,7 +393,7 @@ public class UserControllerCommonIntegrationTest {
         updateNameRequestDto.setFirstName("Jane");
         updateNameRequestDto.setLastName("Doe");
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())

@@ -306,7 +306,7 @@ public class UserControllerTest {
 
     @Test
     void testUpdateNameSuccessfully() throws Exception {
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -317,7 +317,7 @@ public class UserControllerTest {
         Mockito.doThrow(new UserNotFoundException(1))
                 .when(userService).updateName(1, updateNameRequestDto);
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -329,7 +329,7 @@ public class UserControllerTest {
         Mockito.doThrow(new NameNotChangedException())
                 .when(userService).updateName(1, updateNameRequestDto);
 
-        mockMvc.perform(put("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/1/name")
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
