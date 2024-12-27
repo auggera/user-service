@@ -4,7 +4,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import ua.lastbite.userservice.dto.user.UserRegistrationRequestDto;
 
-public class UserRegistrationPhoneNumberValidator
+public class RegisterPhoneNumberValidator
         extends AbstractPhoneNumberValidator
         implements ConstraintValidator<ValidPhoneNumber, UserRegistrationRequestDto> {
 
