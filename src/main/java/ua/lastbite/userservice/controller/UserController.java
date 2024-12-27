@@ -98,10 +98,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/name")
+    @PatchMapping("/{id}/name")
     public ResponseEntity<Void> changeName(@PathVariable Integer id,
                                            @Valid @RequestBody UpdateNameRequestDto request) {
-        log.info("Request received: PUT /api/users/{}/name - Change name", id);
+        log.info("Request received: PATCH /api/users/{}/name - Change name", id);
         userService.updateName(id, request);
 
         log.info("Name updated for user with id {}", id);

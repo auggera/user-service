@@ -341,14 +341,14 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @BeforeEach
-    void setUpChangeNameRequest() {
+    void setUpUpdateNameRequest() {
         updateNameRequestDto = new UpdateNameRequestDto();
         updateNameRequestDto.setFirstName("John");
         updateNameRequestDto.setLastName("Jackson");
     }
 
     @Test
-    void testChangeName() throws Exception {
+    void testUpdateName() throws Exception {
         userRepository.save(existingUser);
 
         mockMvc.perform(put("/api/users/1/name")
@@ -363,7 +363,7 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangeNameShortFirstName() throws Exception {
+    void testUpdateNameShortFirstName() throws Exception {
         updateNameRequestDto.setFirstName("J");
         userRepository.save(existingUser);
 
@@ -375,7 +375,7 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangeNameLastNameIsNull() throws Exception {
+    void testUpdateNameLastNameIsNull() throws Exception {
         updateNameRequestDto.setLastName(null);
         userRepository.save(existingUser);
 
@@ -387,7 +387,7 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangeNameInvalidFirstName() throws Exception {
+    void testUpdateNameInvalidFirstName() throws Exception {
         updateNameRequestDto.setFirstName("1234Name");
         userRepository.save(existingUser);
 
@@ -399,7 +399,7 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangeNameNotChanged() throws Exception {
+    void testUpdateNameNotChanged() throws Exception {
         userRepository.save(existingUser);
 
         updateNameRequestDto.setFirstName("Jane");

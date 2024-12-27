@@ -7,33 +7,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class EmailAddressValidatorTest {
+public class EmailValidatorTest {
 
-    private EmailAddressValidator emailAddressValidator;
+    private EmailValidator emailValidator;
     private ConstraintValidatorContext context;
 
     @BeforeEach
     public void setUp() {
-        emailAddressValidator = new EmailAddressValidator();
+        emailValidator = new EmailValidator();
         context = mock(ConstraintValidatorContext.class);
     }
 
     @Test
     void validEmailAddress() {
-        assertTrue(emailAddressValidator.isValid("email@example.com", context));
+        assertTrue(emailValidator.isValid("email@example.com", context));
     }
 
     @Test
     void invalidEmailAddress() {
-        assertFalse(emailAddressValidator.isValid("example.com", context));
-        assertFalse(emailAddressValidator.isValid("@example.com", context));
-        assertFalse(emailAddressValidator.isValid("email@.com", context));
-        assertFalse(emailAddressValidator.isValid("email@com", context));
-        assertFalse(emailAddressValidator.isValid("test@email@example.com", context));
-        assertFalse(emailAddressValidator.isValid("email@example,com", context));
-        assertFalse(emailAddressValidator.isValid("email@example.c", context));
-        assertFalse(emailAddressValidator.isValid("test email@example.com", context));
-        assertFalse(emailAddressValidator.isValid("test@example.com.", context));
-        assertFalse(emailAddressValidator.isValid("email@example..com", context));
+        assertFalse(emailValidator.isValid("example.com", context));
+        assertFalse(emailValidator.isValid("@example.com", context));
+        assertFalse(emailValidator.isValid("email@.com", context));
+        assertFalse(emailValidator.isValid("email@com", context));
+        assertFalse(emailValidator.isValid("test@email@example.com", context));
+        assertFalse(emailValidator.isValid("email@example,com", context));
+        assertFalse(emailValidator.isValid("email@example.c", context));
+        assertFalse(emailValidator.isValid("test email@example.com", context));
+        assertFalse(emailValidator.isValid("test@example.com.", context));
+        assertFalse(emailValidator.isValid("email@example..com", context));
     }
 }

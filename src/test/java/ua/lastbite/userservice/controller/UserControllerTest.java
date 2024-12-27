@@ -298,14 +298,14 @@ public class UserControllerTest {
     }
 
     @BeforeEach
-    void setUpChangeNameRequest() {
+    void setUpUpdateNameRequest() {
         updateNameRequestDto = new UpdateNameRequestDto();
         updateNameRequestDto.setFirstName("Davis");
         updateNameRequestDto.setLastName("Deutsch");
     }
 
     @Test
-    void testChangeNameSuccessfully() throws Exception {
+    void testUpdateNameSuccessfully() throws Exception {
         mockMvc.perform(put("/api/users/1/name")
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -313,7 +313,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangeNameUserNotFoundException() throws Exception {
+    void testUpdateNameUserNotFoundException() throws Exception {
         Mockito.doThrow(new UserNotFoundException(1))
                 .when(userService).updateName(1, updateNameRequestDto);
 
@@ -325,7 +325,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangeNameNotChangedException() throws Exception {
+    void testUpdateNameNotChangedException() throws Exception {
         Mockito.doThrow(new NameNotChangedException())
                 .when(userService).updateName(1, updateNameRequestDto);
 

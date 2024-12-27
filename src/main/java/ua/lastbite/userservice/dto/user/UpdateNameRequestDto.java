@@ -1,7 +1,5 @@
 package ua.lastbite.userservice.dto.user;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import ua.lastbite.userservice.validation.ValidName;
 import ua.lastbite.userservice.validation.ValidSize;
