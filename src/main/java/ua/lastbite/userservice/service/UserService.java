@@ -133,12 +133,12 @@ public class UserService {
 
         boolean isUpdated = false;
 
-        if (request.getFirstName() != null && !request.getFirstName().equals(existingUser.getFirstName())) {
+        if (isUpdateRequired(existingUser.getFirstName(), request.getFirstName())) {
             existingUser.setFirstName(request.getFirstName());
             isUpdated = true;
         }
 
-        if (request.getLastName() != null && !request.getLastName().equals(existingUser.getLastName())) {
+        if (isUpdateRequired(existingUser.getLastName(), request.getLastName())) {
             existingUser.setLastName(request.getLastName());
             isUpdated = true;
         }
@@ -149,6 +149,10 @@ public class UserService {
 
         existingUser.setUpdatedAt(LocalDateTime.now());
         userRepository.save(existingUser);
+    }
+
+    private boolean isUpdateRequired(String existingName, String newName) {
+        return newName != null && !existingName.equals(newName);
     }
 
     private void checkIfEmailOrPhoneExists(UserRegistrationRequestDto request) {
