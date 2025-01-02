@@ -47,7 +47,7 @@ jobs:
                -d '{
                  "embeds": [{
                    "title": "✅ Build and Test Succeeded",
-                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Event**: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                    "color": 3066993
                  }]
                }' \
@@ -61,7 +61,7 @@ jobs:
                -d '{
                  "embeds": [{
                    "title": "❌ Build or Test Failed",
-                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Error:** Check logs for details.\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Event**: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Job:** Default CI Pipeline\n**Error:** Check logs for details.\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                    "color": 15158332
                  }]
                }' \
