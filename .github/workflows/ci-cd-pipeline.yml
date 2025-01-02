@@ -42,7 +42,7 @@ jobs:
                -d '{
                  "embeds": [{
                    "title": "✅ Build and Test Succeeded",
-                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Job:** Default CI Pipeline",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Author:** ${{ github.actor }}\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) \n**Job:** Default CI Pipeline",
                    "color": 3066993
                  }]
                }' \
@@ -55,7 +55,7 @@ jobs:
                -d '{
                  "embeds": [{
                    "title": "❌ Build or Test Failed",
-                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Error:** Check logs for details.\n**Job:** Default CI Pipeline",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Author:** ${{ github.actor }}\n**Error:** Check logs for details.\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) \n**Job:** Default CI Pipeline",
                    "color": 15158332
                  }]
                }' \
