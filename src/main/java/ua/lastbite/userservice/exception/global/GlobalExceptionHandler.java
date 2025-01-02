@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// add logs 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -67,8 +68,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(EmailAddressNotChangedException.class)
-    public ResponseEntity<String> handleEmailNotChanged(EmailAddressNotChangedException ex) {
+    @ExceptionHandler(EmailNotChangedException.class)
+    public ResponseEntity<String> handleEmailNotChanged(EmailNotChangedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

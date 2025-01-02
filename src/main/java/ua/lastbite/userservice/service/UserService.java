@@ -70,7 +70,7 @@ public class UserService {
         String newEmail = request.getNewEmail();
 
         if (existingUser.getEmail().equals(newEmail)) {
-            throw new EmailAddressNotChangedException();
+            throw new EmailNotChangedException();
         }
 
         if (userRepository.findByEmail(newEmail).isPresent()) {

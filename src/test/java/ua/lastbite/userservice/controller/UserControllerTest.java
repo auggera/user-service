@@ -185,7 +185,7 @@ public class UserControllerTest {
 
     @Test
     void testChangeEmailAddressNotChangedException() throws Exception {
-        Mockito.doThrow(new EmailAddressNotChangedException())
+        Mockito.doThrow(new EmailNotChangedException())
                 .when(userService).updateEmailAddress(1, changeEmailRequestDto);
 
         mockMvc.perform(put("/api/users/1/email")

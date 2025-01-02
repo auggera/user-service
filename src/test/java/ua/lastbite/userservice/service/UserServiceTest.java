@@ -279,7 +279,7 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(existingUser));
 
-        EmailAddressNotChangedException exception = assertThrows(EmailAddressNotChangedException.class,
+        EmailNotChangedException exception = assertThrows(EmailNotChangedException.class,
                 () -> userService.updateEmailAddress(1, request));
 
         assertEquals("New email is the same as the current email", exception.getMessage());
