@@ -35,14 +35,19 @@ jobs:
         run: mvn test
         continue-on-error: true
 
+      - name: Get Commit List
+        run: |
+          git log --oneline ${{ github.event.before }}..${{ github.sha }} > commits.txt
+
       - name: Notify Discord - Success
         if: success()
         run: |
+          COMMITS=$(cat commits.txt | head -n 10 | sed ':a;N;$!ba;s/\n/\\n/g')
           curl -H "Content-Type: application/json" \
                -d '{
                  "embeds": [{
                    "title": "✅ Build and Test Succeeded",
-                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Author:** ${{ github.actor }}\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                    "color": 3066993
                  }]
                }' \
@@ -51,11 +56,12 @@ jobs:
       - name: Notify Discord - Failure
         if: failure()
         run: |
+          COMMITS=$(cat commits.txt | head -n 10 | sed ':a;N;$!ba;s/\n/\\n/g')
           curl -H "Content-Type: application/json" \
                -d '{
                  "embeds": [{
                    "title": "❌ Build or Test Failed",
-                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Author:** ${{ github.actor }}\n**Error:** Check logs for details.\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                   "description": "**Branch:** ${{ github.ref_name }}\nEvent: ${{ github.event_name }}\n**Commits:**\n'"${COMMITS}"'\n**Author:** ${{ github.actor }}\n**Error:** Check logs for details.\n**Job:** Default CI Pipeline\n[View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                    "color": 15158332
                  }]
                }' \
