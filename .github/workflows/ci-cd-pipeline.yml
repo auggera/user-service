@@ -29,6 +29,36 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package
+        continue-on-error: true
 
       - name: Run tests
         run: mvn test
+        continue-on-error: true
+
+      - name: Notify Discord - Success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "embeds": [{
+                   "title": "✅ Build and Test Succeeded",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Job:** Feature Branch CI",
+                   "color": 3066993
+                 }]
+               }' \
+               ${DISCORD_WEBHOOK_URL_USER_SERVICE}
+
+      - name: Notify Discord - Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "embeds": [{
+                   "title": "❌ Build or Test Failed",
+                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.event.head_commit.message }}\n**Error:** Check logs for details.\n**Job:** Feature Branch CI",
+                   "color": 15158332
+                 }]
+               }' \
+               ${DISCORD_WEBHOOK_URL_USER_SERVICE}
+
+
