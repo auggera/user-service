@@ -39,7 +39,13 @@ jobs:
 
       - name: Get Commit List
         run: |
-          git log --oneline ${{ github.event.before }}..${{ github.sha }} > commits.txt
+          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ];
+          then
+            git log --oneline ${{ github.event.before }}..${{ github.sha }} | head -n 10 > commits.txt
+          else
+            git log --oneline HEAD~10..HEAD > commits.txt
+          fi
+      
 
       - name: Notify Discord - Pull Request Opened
         if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
