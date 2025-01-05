@@ -36,6 +36,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Test SonarQube connectivity
+        run: curl ${{ secrets.SONAR_HOST_URL }}/api/server/version
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Build, Test, and Analyze with SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
