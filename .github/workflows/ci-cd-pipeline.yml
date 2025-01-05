@@ -41,6 +41,32 @@ jobs:
         run: |
           git log --oneline ${{ github.event.before }}..${{ github.sha }} > commits.txt
 
+      - name: Notify Discord - Pull Request Opened
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "embeds": [{
+                   "title": "📋 New Pull Request Opened",
+                   "description": "**Title:** ${{ github.event.pull_request.title }}\n**Author:** @${{ github.event.pull_request.user.login }}\n**Branch:** ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}\n[View Pull Request](${{ github.event.pull_request.html_url }})",
+                   "color": 3447003
+                 }]
+               }' \
+               ${{ secrets.DISCORD_WEBHOOK_URL_PR }}
+
+      - name: Notify Discord - Pull Request Updated
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'edited' }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "embeds": [{
+                   "title": "✏️ Pull Request Updated",
+                   "description": "**Title:** ${{ github.event.pull_request.title }}\n**Author:** @${{ github.event.pull_request.user.login }}\n**Branch:** ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}\n[View Pull Request](${{ github.event.pull_request.html_url }})",
+                   "color": 16776960
+                 }]
+               }' \
+               ${{ secrets.DISCORD_WEBHOOK_URL_PR }}
+
       - name: Notify Discord - Success
         if: success()
         run: |
