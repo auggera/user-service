@@ -1,13 +1,16 @@
-name: Notifications and Security Scan
+name: Push and PR Notifications
 
 on:
+  workflow_run:
+    workflows: [ "Build and Test" ]
+    types:
+      - completed
   pull_request:
-    types: [opened, edited, reopened, closed]
+    types: [ opened, edited, reopened, closed ]
   push:
     branches:
       - main
       - develop
-      - feature/*
 
 jobs:
   send_notifications:
@@ -138,3 +141,9 @@ jobs:
                  }]
                }' \
                ${{ secrets.DISCORD_WEBHOOK_URL_USER_SERVICE }}
+
+defaults:
+permissions:
+env:
+run-name:
+concurrency:

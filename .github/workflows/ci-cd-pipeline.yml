@@ -1,8 +1,8 @@
-name: Feature Branch CI
+name: Build and Test
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
+    branches: [ feature/* ]
   pull_request:
     branches: [ main, develop ]
 
@@ -35,3 +35,9 @@ jobs:
 
       - name: Run tests
         run: mvn test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-results
+          path: target/
