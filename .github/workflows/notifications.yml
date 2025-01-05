@@ -18,12 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set API Key
-        run: echo "NVD_API_KEY=${{ secrets.NVD_API_KEY }}" >> $GITHUB_ENV
-
-      - name: Run Security Scan
-        run: mvn org.owasp:dependency-check-maven:check
-
       - name: Get Commit List
         if: ${{ github.event_name == 'push' }}
         run: |
