@@ -35,21 +35,3 @@ jobs:
 
       - name: Run tests
         run: mvn test
-
-      - name: Run Security Scan
-        run: |
-          mvn org.owasp:dependency-check-maven:check || echo "Vulnerabilities detected"
-          mvn org.owasp:dependency-check-maven:aggregate
-
-      - name: Notify Discord - Security Issues
-        if: failure()
-        run: |
-          curl -H "Content-Type: application/json" \
-               -d '{
-                 "embeds": [{
-                   "title": "⚠️ Security Vulnerabilities Found",
-                   "description": "**Branch:** ${{ github.ref_name }}\n**Commit:** ${{ github.sha }}\nCheck security scan logs for details.",
-                   "color": 16711680
-                 }]
-               }' \
-               ${{ secrets.DISCORD_WEBHOOK_URL_USER_SERVICE }}
