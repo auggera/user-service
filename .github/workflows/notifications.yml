@@ -144,9 +144,3 @@ jobs:
                  }]
                }' \
                ${{ secrets.DISCORD_WEBHOOK_URL_USER_SERVICE }}
-
-defaults:
-permissions:
-env:
-run-name:
-concurrency:
