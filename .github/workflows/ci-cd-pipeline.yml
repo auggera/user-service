@@ -47,7 +47,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonar source.scanner.maven:sonar-maven-plugin:sonar -D sonar.projectKey=user-service -D sonar.projectName='user-service'
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=user-service -Dsonar.projectName='user-service'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
