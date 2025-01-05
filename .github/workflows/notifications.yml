@@ -22,7 +22,7 @@ jobs:
         run: echo "NVD_API_KEY=${{ secrets.NVD_API_KEY }}" >> $GITHUB_ENV
 
       - name: Run Security Scan
-        run: mvn org.owasp:dependency-check-maven:check
+        run: mvn org.owasp:dependency-check-maven:check -find.api.key=$NVD_API_KEY
 
       - name: Get Commit List
         if: ${{ github.event_name == 'push' }}
