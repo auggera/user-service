@@ -10,7 +10,7 @@ import ua.lastbite.userservice.model.UserRole;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserRegistrationMapperTest {
+class UserRegistrationMapperTest {
 
     private UserRegistrationMapper userRegistrationMapper;
 

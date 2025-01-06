@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class EmailValidatorTest {
+class EmailValidatorTest {
 
     private EmailValidator emailValidator;
     private ConstraintValidatorContext context;

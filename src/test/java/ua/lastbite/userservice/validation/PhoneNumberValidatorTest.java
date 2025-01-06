@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequestDto;
 import ua.lastbite.userservice.model.CountryCode;
 
-public class PhoneNumberValidatorTest {
+class PhoneNumberValidatorTest {
 
     private ChangePhoneNumberValidator changePhoneNumberValidator;
 

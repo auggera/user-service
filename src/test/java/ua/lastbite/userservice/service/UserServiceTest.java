@@ -30,7 +30,7 @@ import ua.lastbite.userservice.model.UserRole;
 import ua.lastbite.userservice.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class NameValidatorTest {
+class NameValidatorTest {
 
     private NameValidator nameValidator = new NameValidator();
     private ConstraintValidatorContext context;
