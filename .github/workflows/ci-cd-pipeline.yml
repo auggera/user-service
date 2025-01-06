@@ -15,13 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -36,19 +29,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Test SonarQube connectivity
-        run: curl ${{ secrets.SONAR_HOST_URL }}/api/server/version
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Build with Maven
+        run: mvn clean package
 
-      - name: Build, Test, and Analyze with SonarQube
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=user-service -Dsonar.projectName='user-service'
+      - name: Run tests
+        run: mvn test
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
-        with:
-          name: build-results
-          path: target/
