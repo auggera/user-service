@@ -9,12 +9,12 @@ import static org.mockito.Mockito.mock;
 
 class EmailValidatorTest {
 
-    private EmailValidator emailValidator;
+    private CustomEmailValidator emailValidator;
     private ConstraintValidatorContext context;
 
     @BeforeEach
     public void setUp() {
-        emailValidator = new EmailValidator();
+        emailValidator = new CustomEmailValidator();
         context = mock(ConstraintValidatorContext.class);
     }
 
