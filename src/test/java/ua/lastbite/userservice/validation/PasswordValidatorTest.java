@@ -40,6 +40,11 @@ class PasswordValidatorTest {
 
     @Test
     void testPasswordEmptyString() {
-        assertFalse(passwordValidator.isValid("", context));
+        assertTrue(passwordValidator.isValid("", context));
+    }
+
+    @Test
+    void testPasswordIsNull() {
+        assertTrue(passwordValidator.isValid(null, context));
     }
 }
