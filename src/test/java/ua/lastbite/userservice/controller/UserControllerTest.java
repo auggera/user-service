@@ -366,7 +366,7 @@ class UserControllerTest {
         Mockito.when(userService.getUserEmailInfo(userId))
                 .thenReturn(emailInfoResponseDto);
 
-        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("email@example.com"))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -379,7 +379,7 @@ class UserControllerTest {
         Mockito.when(userService.getUserEmailInfo(userId))
                 .thenThrow(new UserNotFoundException(userId));
 
-        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", userId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID " + userId + " not found"));
     }

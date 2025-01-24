@@ -5,7 +5,7 @@ databaseChangeLog:
       changes:
 
         - createTable:
-            tableName: app_user
+            tableName: users
             columns:
               - column:
                   name: id
@@ -73,10 +73,3 @@ databaseChangeLog:
                   name: updated_at
                   type: timestamp
                   defaultValueDate: CURRENT_TIMESTAMP
-  - changeSet:
-      id: 2
-      author: Augustin
-      changes:
-        - renameTable:
-            oldTableName: app_user
-            newTableName: users
