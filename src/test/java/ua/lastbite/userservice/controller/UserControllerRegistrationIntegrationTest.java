@@ -48,7 +48,7 @@ class UserControllerRegistrationIntegrationTest {
 
     @BeforeEach
     void cleanDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE app_user RESTART IDENTITY");
+        jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
     }
 
     @BeforeEach

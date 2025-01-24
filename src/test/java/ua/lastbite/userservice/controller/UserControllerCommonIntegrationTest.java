@@ -51,7 +51,7 @@ class UserControllerCommonIntegrationTest {
 
     @BeforeEach
     public void cleanDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE app_user RESTART IDENTITY");
+        jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
     }
 
     private static final int USER_ID = 1;
