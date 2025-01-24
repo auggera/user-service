@@ -400,7 +400,7 @@ class UserControllerCommonIntegrationTest {
         User user = userRepository.save(existingUser);
         int userId = user.getId();
 
-        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(existingUser.getEmail()))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -408,7 +408,7 @@ class UserControllerCommonIntegrationTest {
 
     @Test
     void testGetUserEmailInfoUserNotFound() throws Exception {
-        mockMvc.perform(get("/api/users/{id}/email-info", USER_ID))
+        mockMvc.perform(get("/api/users/{id}/email/info", USER_ID))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
