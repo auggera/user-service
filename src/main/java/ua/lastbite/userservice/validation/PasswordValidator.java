@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
     private static final Pattern LETTER = Pattern.compile(".*[a-zA-Z].*");
-    private static final Pattern DIGIT = Pattern.compile(".*[0-9].*");
+    private static final Pattern DIGIT = Pattern.compile(".*\\d.*");
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
