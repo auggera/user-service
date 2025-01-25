@@ -5,10 +5,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import ua.lastbite.userservice.dto.user.ChangePhoneNumberRequestDto;
 import ua.lastbite.userservice.model.CountryCode;
 
-public class PhoneNumberValidatorTest {
+import java.util.stream.Stream;
+
+class PhoneNumberValidatorTest {
 
     private ChangePhoneNumberValidator changePhoneNumberValidator;
 
@@ -23,33 +28,20 @@ public class PhoneNumberValidatorTest {
         assertTrue(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
     }
 
-    @Test
-    void testPhoneNumberTooShort() {
-        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(CountryCode.UA, "12345");
+    @ParameterizedTest
+    @MethodSource("invalidPhoneNumberProvider")
+    void shouldReturnFalseWheInvalidPhoneNumber(CountryCode countryCode, String phoneNumber) {
+        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(countryCode, phoneNumber);
         assertFalse(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
     }
 
-    @Test
-    void testPhoneNumberTooLong() {
-        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(CountryCode.UA, "123456789012345");
-        assertFalse(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
-    }
-
-    @Test
-    void testInvalidPhoneNumberFormat() {
-        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(CountryCode.UA, "abc123xyz");
-        assertFalse(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
-    }
-
-    @Test
-    void testNullPhoneNumber() {
-        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(CountryCode.UA, null);
-        assertFalse(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
-    }
-
-    @Test
-    void testNullCountryCode() {
-        ChangePhoneNumberRequestDto request = new ChangePhoneNumberRequestDto(null, "987654321");
-        assertFalse(changePhoneNumberValidator.isValidPhoneNumber(request.getCountryCode(), request.getNewPhoneNumber()));
+    static Stream<Arguments> invalidPhoneNumberProvider() {
+        return Stream.of(
+                Arguments.of(CountryCode.UA, "12345"),
+                Arguments.of(CountryCode.UA, "123456789012345"),
+                Arguments.of(CountryCode.UA, "abc123xyz"),
+                Arguments.of(CountryCode.UA, null),
+                Arguments.of(null, "987654321")
+        );
     }
 }

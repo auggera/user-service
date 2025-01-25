@@ -1,5 +1,6 @@
 package ua.lastbite.userservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -35,7 +37,10 @@ public class UserService {
     }
 
     public UserResponseDto register(UserRegistrationRequestDto request) {
-        checkIfEmailOrPhoneExists(request);
+        log.info("Attempting to register user with email: {}", request.getEmail());
+        log.debug("Checking if email or phone number already exists: email={}, phone={}", request.getEmail(), request.getPhoneNumber());
+        checkIfEmailExists(request.getEmail());
+        checkIfPhoneNumberExists(request.getPhoneNumber());
 
         User user = registrationMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -46,36 +51,38 @@ public class UserService {
 
     public Page<UserResponseDto> getAllUsers(Pageable pageable) {
         Page<User> usersPage = userRepository.findAll(pageable);
+        log.info("Fetched {} users", usersPage.getTotalElements());
         return userResponseMapper.toUserResponseDtoPage(usersPage);
     }
 
-    public UserResponseDto getUserById(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public UserResponseDto getUserById(Long id) {
+        log.info("Fetching user by id: {}", id);
+        User user = findById(id);
 
         return userResponseMapper.toUserResponseDto(user);
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUser(Long id) {
+        log.info("Attempting to delete user with id: {}", id);
         if (!userRepository.existsById(id)) {
+            log.error("User doesn't exists with id: {}", id);
             throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
     }
 
-    public void updateEmailAddress(Integer id, ChangeEmailRequestDto request) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public void updateEmailAddress(Long id, ChangeEmailRequestDto request) {
+        log.info("Updating email address for user with id: {}", id);
+        User existingUser = findById(id);
 
         String newEmail = request.getNewEmail();
 
         if (existingUser.getEmail().equals(newEmail)) {
+            log.warn("Email not changed for user with id: {}", id);
             throw new EmailNotChangedException();
         }
 
-        if (userRepository.findByEmail(newEmail).isPresent()) {
-            throw new EmailAlreadyExistsException(newEmail);
-        }
+        checkIfEmailExists(newEmail);
 
         existingUser.setEmail(newEmail);
         existingUser.setEmailVerified(false);
@@ -83,18 +90,20 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePassword(Integer id, ChangePasswordRequestDto request) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public void updatePassword(Long id, ChangePasswordRequestDto request) {
+        log.info("Updating password for user with id: {}", id);
+        User existingUser = findById(id);
 
         String currentPassword = request.getCurrentPassword();
         String newPassword = request.getNewPassword();
 
         if (!passwordEncoder.matches(currentPassword, existingUser.getPassword())) {
+            log.error("Incorrect current password for user with id: {}", id);
             throw new IncorrectCurrentPasswordException();
         }
 
         if (passwordEncoder.matches(newPassword, existingUser.getPassword())) {
+            log.warn("New password matches the old password for user with id: {}", id);
             throw new PasswordNotChangedException();
         }
 
@@ -103,20 +112,19 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePhoneNumber(Integer id, ChangePhoneNumberRequestDto request) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public void updatePhoneNumber(Long id, ChangePhoneNumberRequestDto request) {
+        log.info("Updating phone number for user with id: {}", id);
+        User existingUser = findById(id);
 
         CountryCode countryCode = request.getCountryCode();
         String newPhoneNumber = request.getNewPhoneNumber();
 
         if (existingUser.getPhoneNumber().equals(newPhoneNumber)) {
+            log.warn("Phone number not changed for user with id: {}", id);
             throw new PhoneNumberNotChangedException();
         }
 
-        if(userRepository.findByPhoneNumber(newPhoneNumber).isPresent()) {
-            throw new PhoneNumberAlreadyExistsException(newPhoneNumber);
-        }
+        checkIfPhoneNumberExists(newPhoneNumber);
 
         if (!countryCode.equals(existingUser.getCountryCode())) {
             existingUser.setCountryCode(countryCode);
@@ -127,9 +135,9 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updateName(Integer id, UpdateNameRequestDto request) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public void updateName(Long id, UpdateNameRequestDto request) {
+        log.info("Updating name for user with id: {}", id);
+        User existingUser = findById(id);
 
         boolean isUpdated = false;
 
@@ -144,6 +152,7 @@ public class UserService {
         }
 
         if (!isUpdated) {
+            log.warn("Name not changed for user with id: {}", id);
             throw new NameNotChangedException();
         }
 
@@ -155,20 +164,40 @@ public class UserService {
         return newName != null && !existingName.equals(newName);
     }
 
-    private void checkIfEmailOrPhoneExists(UserRegistrationRequestDto request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException(request.getEmail());
-        }
+    public EmailInfoResponseDto getUserEmailInfo(Long id) {
+        log.info("Fetching email info for user with id: {}", id);
+        User user = findById(id);
 
-        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-            throw new PhoneNumberAlreadyExistsException(request.getPhoneNumber());
+        return new EmailInfoResponseDto(user.getEmail(), user.isEmailVerified());
+    }
+
+    public void markEmailAsVerified(Long id) {
+        log.info("Marking email as verified for user with id: {}", id);
+        User user = findById(id);
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+    }
+
+    private User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with id: {}", id);
+                    return new UserNotFoundException(id);
+                });
+    }
+
+    private void checkIfEmailExists(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            log.error("Email already exists: {}", email);
+            throw new EmailAlreadyExistsException(email);
         }
     }
 
-    public EmailInfoResponseDto getUserEmailInfo(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-
-        return new EmailInfoResponseDto(user.getEmail(), user.isEmailVerified());
+    private void checkIfPhoneNumberExists(String phoneNumber) {
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            log.error("Phone number already exists: {}", phoneNumber);
+            throw new PhoneNumberAlreadyExistsException(phoneNumber);
+        }
     }
 }

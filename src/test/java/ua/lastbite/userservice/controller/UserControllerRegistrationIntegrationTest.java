@@ -3,6 +3,9 @@ package ua.lastbite.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +21,7 @@ import ua.lastbite.userservice.model.UserRole;
 import ua.lastbite.userservice.repository.UserRepository;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UserControllerRegistrationIntegrationTest {
+class UserControllerRegistrationIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,12 +47,13 @@ public class UserControllerRegistrationIntegrationTest {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private static final long USER_ID = 1;
     UserRegistrationRequestDto userRegistrationRequestDto;
     User existingUser;
 
     @BeforeEach
     void cleanDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE app_user RESTART IDENTITY");
+        jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
     }
 
     @BeforeEach
@@ -63,7 +68,7 @@ public class UserControllerRegistrationIntegrationTest {
         userRegistrationRequestDto.setRole(UserRole.CUSTOMER);
 
         existingUser = new User();
-        existingUser.setId(1);
+        existingUser.setId(USER_ID);
         existingUser.setFirstName("Jane");
         existingUser.setLastName("Doe");
         existingUser.setEmail("jane@example.com");
@@ -135,48 +140,25 @@ public class UserControllerRegistrationIntegrationTest {
                 .andExpect(content().string("Phone number " + userRegistrationRequestDto.getPhoneNumber() + " is already in use"));
     }
 
-    @Test
-    void testRegisterUserPhoneNumberTooLong() throws Exception {
-        userRegistrationRequestDto.setPhoneNumber("123456789000");
+    @ParameterizedTest
+    @MethodSource("invalidPhoneNumberProvider")
+    void testRegisterUserWithEmptyPhoneNumber(String phoneNumber, String error) throws Exception {
+        userRegistrationRequestDto.setPhoneNumber(phoneNumber);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
+                .andExpect(jsonPath("$.phoneNumber").value(error));
     }
 
-    @Test
-    void testRegisterUserPhoneNumberTooShort() throws Exception {
-        userRegistrationRequestDto.setPhoneNumber("12345");
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
-    }
-
-    @Test
-    void testRegisterUserWithInvalidPhoneNumberFormat() throws Exception {
-        userRegistrationRequestDto.setPhoneNumber("312#-invalid");
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.phoneNumber").value("Invalid phone number format"));
-    }
-
-    @Test
-    void testRegisterUserWithEmptyPhoneNumber() throws Exception {
-        userRegistrationRequestDto.setPhoneNumber(null);
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userRegistrationRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.phoneNumber").value("Phone number cannot be empty"));
+    static Stream<Arguments> invalidPhoneNumberProvider() {
+        return Stream.of(
+                Arguments.of("123456789000", "Invalid phone number format"),
+                Arguments.of("12345", "Invalid phone number format"),
+                Arguments.of("312#-invalid", "Invalid phone number format"),
+                Arguments.of(null, "Phone number cannot be empty")
+        );
     }
 
     @Test

@@ -3,6 +3,9 @@ package ua.lastbite.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +23,8 @@ import ua.lastbite.userservice.model.User;
 import ua.lastbite.userservice.model.UserRole;
 import ua.lastbite.userservice.repository.UserRepository;
 
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UserControllerCommonIntegrationTest {
+class UserControllerCommonIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,9 +51,10 @@ public class UserControllerCommonIntegrationTest {
 
     @BeforeEach
     public void cleanDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE app_user RESTART IDENTITY");
+        jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
     }
 
+    private static final long USER_ID = 1;
     User existingUser;
     ChangeEmailRequestDto changeEmailRequestDto;
     ChangePasswordRequestDto changePasswordRequestDto;
@@ -98,7 +104,7 @@ public class UserControllerCommonIntegrationTest {
     void testGetUserById() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(get("/api/users/1"))
+        mockMvc.perform(get("/api/users/{id}", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Jane"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
@@ -108,9 +114,9 @@ public class UserControllerCommonIntegrationTest {
 
     @Test
     void testGetUserByIdNotFound() throws Exception {
-        mockMvc.perform(get("/api/users/1"))
+        mockMvc.perform(get("/api/users/{id}", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @BeforeEach
@@ -122,36 +128,36 @@ public class UserControllerCommonIntegrationTest {
     void testChangeEmail() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isNoContent());
 
-        User updatedUser = userRepository.findById(1).orElse(null);
+        User updatedUser = userRepository.findById(USER_ID).orElse(null);
         assertNotNull(updatedUser);
         assertEquals(changeEmailRequestDto.getNewEmail(), updatedUser.getEmail());
     }
 
-    @Test
-    void testChangeNewEmailIsNull() throws Exception {
-        changeEmailRequestDto.setNewEmail(null);
 
-        mockMvc.perform(put("/api/users/1/email")
+    @ParameterizedTest
+    @MethodSource("invalidEmailProvider")
+    void shouldReturnBadRequestWhenEmailIsInvalid(String email, String message) throws Exception {
+        changeEmailRequestDto.setNewEmail(email);
+
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newEmail").value("New email cannot be empty"));
+                .andExpect(jsonPath("$.newEmail").value(message));
     }
 
-    @Test
-    void testChangeEmailInvalidEmail() throws Exception {
-        changeEmailRequestDto.setNewEmail("invalid@email..com");
-
-        mockMvc.perform(put("/api/users/1/email")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newEmail").value("Invalid email format"));
+    static Stream<Arguments> invalidEmailProvider() {
+        return Stream.of(
+                Arguments.of(null, "New email cannot be empty"),
+                Arguments.of("", "New email cannot be empty"),
+                Arguments.of("invalid@email..com", "Invalid email format"),
+                Arguments.of("invalid.@email.c", "Invalid email format")
+        );
     }
 
     @Test
@@ -159,7 +165,7 @@ public class UserControllerCommonIntegrationTest {
         changeEmailRequestDto.setNewEmail("jane@example.com");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeEmailRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -177,26 +183,36 @@ public class UserControllerCommonIntegrationTest {
     void testChangePassword() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isNoContent());
 
-        User updatedUser = userRepository.findById(1).orElse(null);
+        User updatedUser = userRepository.findById(USER_ID).orElse(null);
         assertNotNull(updatedUser);
         assertTrue(passwordEncoder.matches(changePasswordRequestDto.getNewPassword(), updatedUser.getPassword()));
     }
 
-    @Test
-    void testChangePasswordNewPasswordIsNull() throws Exception {
-        changePasswordRequestDto.setNewPassword(null);
+    @ParameterizedTest
+    @MethodSource("invalidPasswordProvider")
+    void shouldReturnBadRequestWhenPasswordIsInvalid(String password, String message) throws Exception {
+        changePasswordRequestDto.setNewPassword(password);
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPassword").value("New password cannot be empty"));
+                .andExpect(jsonPath("$.newPassword").value(message));
+    }
+
+    static Stream<Arguments> invalidPasswordProvider() {
+        return Stream.of(
+                Arguments.of(null, "New password cannot be empty"),
+                Arguments.of("", "New password cannot be empty"),
+                Arguments.of("invalid", "Password must be at least 8 characters long and contain at least one letter and one number"),
+                Arguments.of("short1", "Password must be at least 8 characters long and contain at least one letter and one number")
+        );
     }
 
     @Test
@@ -204,7 +220,7 @@ public class UserControllerCommonIntegrationTest {
         changePasswordRequestDto.setCurrentPassword(null);
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -216,7 +232,7 @@ public class UserControllerCommonIntegrationTest {
         changePasswordRequestDto.setCurrentPassword("invalid");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -224,23 +240,11 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangePasswordInvalidNewPassword() throws Exception {
-        changePasswordRequestDto.setNewPassword("invalid");
-        userRepository.save(existingUser);
-
-        mockMvc.perform(put("/api/users/1/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPassword").value("Password must be at least 8 characters long and contain at least one letter and one number"));
-    }
-
-    @Test
     void testChangePasswordNotChanged() throws Exception {
         changePasswordRequestDto.setNewPassword("password123");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePasswordRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -258,38 +262,36 @@ public class UserControllerCommonIntegrationTest {
     void testChangePhoneNumber() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isNoContent());
 
-        User updatedUser = userRepository.findById(1).orElse(null);
+        User updatedUser = userRepository.findById(USER_ID).orElse(null);
         assertNotNull(updatedUser);
         assertEquals(changePhoneNumberRequestDto.getNewPhoneNumber(), updatedUser.getPhoneNumber());
     }
 
-    @Test
-    void testChangePhoneNumberInvalidPhoneNumber() throws Exception {
-        changePhoneNumberRequestDto.setNewPhoneNumber("abc123456");
+    @ParameterizedTest
+    @MethodSource("invalidPhoneNumberProvider")
+    void shouldReturnBadRequestWhenPhoneNumberIsInvalid(String phone, String message) throws Exception {
+        changePhoneNumberRequestDto.setNewPhoneNumber(phone);
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
+                .andExpect(jsonPath("$.newPhoneNumber").value(message));
     }
 
-    @Test
-    void testChangePhoneNumberIsNull() throws Exception {
-        changePhoneNumberRequestDto.setNewPhoneNumber(null);
-        userRepository.save(existingUser);
-
-        mockMvc.perform(put("/api/users/1/phone")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPhoneNumber").value("Phone number cannot be empty"));
+    static Stream<Arguments> invalidPhoneNumberProvider()  {
+        return Stream.of(
+            Arguments.of("abc123456", "Invalid phone number format"),
+            Arguments.of(null, "Phone number cannot be empty"),
+            Arguments.of("12345678901234", "Invalid phone number format"),
+            Arguments.of("12345", "Invalid phone number format")
+        );
     }
 
     @Test
@@ -297,7 +299,7 @@ public class UserControllerCommonIntegrationTest {
         changePhoneNumberRequestDto.setCountryCode(null);
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -305,35 +307,11 @@ public class UserControllerCommonIntegrationTest {
     }
 
     @Test
-    void testChangePhoneNumberTooLong() throws Exception {
-        changePhoneNumberRequestDto.setNewPhoneNumber("12345678901234");
-        userRepository.save(existingUser);
-
-        mockMvc.perform(put("/api/users/1/phone")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
-    }
-
-    @Test
-    void testChangePhoneNumberTooShort() throws Exception {
-        changePhoneNumberRequestDto.setNewPhoneNumber("12345");
-        userRepository.save(existingUser);
-
-        mockMvc.perform(put("/api/users/1/phone")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.newPhoneNumber").value("Invalid phone number format"));
-    }
-
-    @Test
     void testChangePhoneNumberNotChanged() throws Exception {
         changePhoneNumberRequestDto.setNewPhoneNumber("987654321");
         userRepository.save(existingUser);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -351,12 +329,12 @@ public class UserControllerCommonIntegrationTest {
     void testUpdateName() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isNoContent());
 
-        User updatedUser = userRepository.findById(1).orElse(null);
+        User updatedUser = userRepository.findById(USER_ID).orElse(null);
         assertNotNull(updatedUser);
         assertEquals(updateNameRequestDto.getFirstName(), updatedUser.getFirstName());
         assertEquals(updateNameRequestDto.getLastName(), updatedUser.getLastName());
@@ -367,7 +345,7 @@ public class UserControllerCommonIntegrationTest {
         updateNameRequestDto.setFirstName("J");
         userRepository.save(existingUser);
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -379,7 +357,7 @@ public class UserControllerCommonIntegrationTest {
         updateNameRequestDto.setFirstName("1234Name");
         userRepository.save(existingUser);
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -393,7 +371,7 @@ public class UserControllerCommonIntegrationTest {
         updateNameRequestDto.setFirstName("Jane");
         updateNameRequestDto.setLastName("Doe");
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateNameRequestDto)))
                 .andExpect(status().isBadRequest())
@@ -404,25 +382,25 @@ public class UserControllerCommonIntegrationTest {
     void testDeleteUser() throws Exception {
         userRepository.save(existingUser);
 
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/{id}", USER_ID))
                 .andExpect(status().isNoContent());
 
-        assertFalse(userRepository.existsById(existingUser.getId()));
+        assertFalse(userRepository.existsById(USER_ID));
     }
 
     @Test
     void testDeleteUserNotFound() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/{id}", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @Test
     void testGetUserEmailInfoSuccessfully() throws Exception {
         User user = userRepository.save(existingUser);
-        int userId = user.getId();
+        long userId = user.getId();
 
-        mockMvc.perform(get("/api/users/{id}/email-info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(existingUser.getEmail()))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -430,8 +408,8 @@ public class UserControllerCommonIntegrationTest {
 
     @Test
     void testGetUserEmailInfoUserNotFound() throws Exception {
-        mockMvc.perform(get("/api/users/1/email-info"))
+        mockMvc.perform(get("/api/users/{id}/email/info", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 }

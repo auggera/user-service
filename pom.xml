@@ -103,6 +103,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.9.0</version>
+		</dependency>
 
 	</dependencies>
 
@@ -127,11 +132,6 @@
 				<configuration>
 					<propertyFile>src/main/resources/liquibase.yaml</propertyFile>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>5.0.0.4389</version>
 			</plugin>
 		</plugins>
 	</build>

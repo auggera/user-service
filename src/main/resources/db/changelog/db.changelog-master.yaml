@@ -5,11 +5,11 @@ databaseChangeLog:
       changes:
 
         - createTable:
-            tableName: app_user
+            tableName: users
             columns:
               - column:
                   name: id
-                  type: int
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     primaryKey: true

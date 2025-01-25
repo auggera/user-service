@@ -11,14 +11,4 @@ public enum CountryCode {
     private final String code;
     private final int[] phoneLengthRange;
     private final String countryName;
-
-    public static CountryCode getByCode(String code) {
-        for (CountryCode countryCode : values()) {
-            if (countryCode.getCode().equals(code)
-                    || countryCode.name().equalsIgnoreCase(code.trim())) {
-                return countryCode;
-            }
-        }
-        return null;
-    }
 }

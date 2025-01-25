@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         log.info("Request received: GET /api/users/{} - Get user by ID", id);
         UserResponseDto user = userService.getUserById(id);
 
@@ -59,9 +59,9 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{id}/email-info")
-    public ResponseEntity<EmailInfoResponseDto> getUserEmailInfo(@PathVariable Integer id) {
-        log.info("Request received: GET /api/users/{}/email-info - Get user email info", id);
+    @GetMapping("/{id}/email/info")
+    public ResponseEntity<EmailInfoResponseDto> getUserEmailInfo(@PathVariable Long id) {
+        log.info("Request received: GET /api/users/{}/email/info - Get user email info", id);
         EmailInfoResponseDto emailInfoResponseDto = userService.getUserEmailInfo(id);
 
         log.debug("Retrieved user email info: {}", emailInfoResponseDto);
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/email")
-    public ResponseEntity<Void> changeEmail(@PathVariable Integer id,
+    public ResponseEntity<Void> changeEmail(@PathVariable Long id,
                                             @Valid @RequestBody ChangeEmailRequestDto request) {
         log.info("Request received: PUT /api/users/{}/email - Change email", id);
         userService.updateEmailAddress(id, request);
@@ -78,8 +78,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/email/verify")
+    public ResponseEntity<Void> verifyEmail(@PathVariable Long id) {
+        log.info("Request received: PUT /api/users/{}/email/verify - Mark email as verified", id);
+        userService.markEmailAsVerified(id);
+
+        log.info("Email marked as verified for user with id {}", id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/password")
-    public ResponseEntity<Void> changePassword(@PathVariable Integer id,
+    public ResponseEntity<Void> changePassword(@PathVariable Long id,
                                                @Valid @RequestBody ChangePasswordRequestDto request) {
         log.info("Request received: PUT /api/users/{}/password - Change password", id);
         userService.updatePassword(id, request);
@@ -89,7 +98,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/phone")
-    public ResponseEntity<Void> changePhoneNumber(@PathVariable Integer id,
+    public ResponseEntity<Void> changePhoneNumber(@PathVariable Long id,
                                                   @Valid @RequestBody ChangePhoneNumberRequestDto request) {
         log.info("Request received: PUT /api/users/{}/phone - Change phone", id);
         userService.updatePhoneNumber(id, request);
@@ -99,7 +108,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/name")
-    public ResponseEntity<Void> updateName(@PathVariable Integer id,
+    public ResponseEntity<Void> updateName(@PathVariable Long id,
                                            @Valid @RequestBody UpdateNameRequestDto request) {
         log.info("Request received: PATCH /api/users/{}/name - Change name", id);
         userService.updateName(id, request);
@@ -109,7 +118,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         log.info("Request received: DELETE /api/users/{} - Delete user", id);
         userService.deleteUser(id);
 

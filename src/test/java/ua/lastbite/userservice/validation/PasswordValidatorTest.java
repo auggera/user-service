@@ -2,12 +2,16 @@ package ua.lastbite.userservice.validation;
 
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class PasswordValidatorTest {
+class PasswordValidatorTest {
 
     private PasswordValidator passwordValidator;
     private ConstraintValidatorContext context;
@@ -18,28 +22,31 @@ public class PasswordValidatorTest {
         context = mock(ConstraintValidatorContext.class);
     }
 
-    @Test
-    void testValidPassword() {
-        assertTrue(passwordValidator.isValid("password123", context));
+    @ParameterizedTest
+    @MethodSource("validPasswordProvider")
+    void testValidPassword(String password) {
+        assertTrue(passwordValidator.isValid(password, context), "Password " + password + " should be valid");
     }
 
-    @Test
-    void testPasswordTooShort() {
-        assertFalse(passwordValidator.isValid("pass12", context));
+    static Stream<Arguments> validPasswordProvider() {
+        return Stream.of(
+                Arguments.of("password123"),
+                Arguments.of(""), // handles @NotBlank
+                Arguments.of( (Object) null) // handles @NotBlank
+        );
     }
 
-    @Test
-    void testPasswordNoLetters() {
-        assertFalse(passwordValidator.isValid("12345678", context));
+    @ParameterizedTest
+    @MethodSource("invalidPasswordProvider")
+    void testPasswordNoLetters(String password) {
+        assertFalse(passwordValidator.isValid(password, context), "Password " + password + " should be invalid");
     }
 
-    @Test
-    void testPasswordNoDigits() {
-        assertFalse(passwordValidator.isValid("password", context));
-    }
-
-    @Test
-    void testPasswordEmptyString() {
-        assertFalse(passwordValidator.isValid("", context));
+    static Stream<Arguments> invalidPasswordProvider() {
+        return Stream.of(
+                Arguments.of("pass12"),
+                Arguments.of("12345678"),
+                Arguments.of("password")
+        );
     }
 }
