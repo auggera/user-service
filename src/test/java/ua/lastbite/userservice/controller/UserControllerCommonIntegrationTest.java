@@ -54,7 +54,7 @@ class UserControllerCommonIntegrationTest {
         jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY");
     }
 
-    private static final int USER_ID = 1;
+    private static final long USER_ID = 1;
     User existingUser;
     ChangeEmailRequestDto changeEmailRequestDto;
     ChangePasswordRequestDto changePasswordRequestDto;
@@ -398,7 +398,7 @@ class UserControllerCommonIntegrationTest {
     @Test
     void testGetUserEmailInfoSuccessfully() throws Exception {
         User user = userRepository.save(existingUser);
-        int userId = user.getId();
+        long userId = user.getId();
 
         mockMvc.perform(get("/api/users/{id}/email/info", userId))
                 .andExpect(status().isOk())

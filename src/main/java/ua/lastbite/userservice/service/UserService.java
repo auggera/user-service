@@ -1,6 +1,7 @@
 package ua.lastbite.userservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,21 +50,21 @@ public class UserService {
         return userResponseMapper.toUserResponseDtoPage(usersPage);
     }
 
-    public UserResponseDto getUserById(Integer id) {
+    public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         return userResponseMapper.toUserResponseDto(user);
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
     }
 
-    public void updateEmailAddress(Integer id, ChangeEmailRequestDto request) {
+    public void updateEmailAddress(Long id, ChangeEmailRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -83,7 +84,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePassword(Integer id, ChangePasswordRequestDto request) {
+    public void updatePassword(Long id, ChangePasswordRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -103,7 +104,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updatePhoneNumber(Integer id, ChangePhoneNumberRequestDto request) {
+    public void updatePhoneNumber(Long id, ChangePhoneNumberRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -127,7 +128,7 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public void updateName(Integer id, UpdateNameRequestDto request) {
+    public void updateName(Long id, UpdateNameRequestDto request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -165,10 +166,18 @@ public class UserService {
         }
     }
 
-    public EmailInfoResponseDto getUserEmailInfo(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+    public EmailInfoResponseDto getUserEmailInfo(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         return new EmailInfoResponseDto(user.getEmail(), user.isEmailVerified());
+    }
+
+    public void markEmailAsVerified(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
     }
 }

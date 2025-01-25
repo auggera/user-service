@@ -43,6 +43,7 @@ class UserControllerRegistrationIntegrationTest {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private static final long USER_ID = 1;
     UserRegistrationRequestDto userRegistrationRequestDto;
     User existingUser;
 
@@ -63,7 +64,7 @@ class UserControllerRegistrationIntegrationTest {
         userRegistrationRequestDto.setRole(UserRole.CUSTOMER);
 
         existingUser = new User();
-        existingUser.setId(1);
+        existingUser.setId(USER_ID);
         existingUser.setFirstName("Jane");
         existingUser.setLastName("Doe");
         existingUser.setEmail("jane@example.com");

@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserResponseMapperTest {
 
+    private static final long USER_ID_1 = 1;
+    private static final long USER_ID_2 = 2;
     private UserResponseMapper userResponseMapper ;
 
     @BeforeEach
@@ -26,7 +28,7 @@ class UserResponseMapperTest {
     @Test
     void testToUserResponseDto() {
         User user = new User();
-        user.setId(1);
+        user.setId(USER_ID_1);
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("john@doe.com");
@@ -35,7 +37,7 @@ class UserResponseMapperTest {
         UserResponseDto responseDto = userResponseMapper.toUserResponseDto(user);
 
         assertNotNull(responseDto);
-        assertEquals(1, responseDto.getId());
+        assertEquals(USER_ID_1, responseDto.getId());
         assertEquals("John", responseDto.getFirstName());
         assertEquals("Doe", responseDto.getLastName());
         assertEquals("john@doe.com", responseDto.getEmail());
@@ -45,14 +47,14 @@ class UserResponseMapperTest {
     @Test
     void testToUserResponseDtoPage() {
         User user1 = new User();
-        user1.setId(1);
+        user1.setId(USER_ID_1);
         user1.setFirstName("John");
         user1.setLastName("Doe");
         user1.setEmail("john@doe.com");
         user1.setRole(UserRole.CUSTOMER);
 
         User user2 = new User();
-        user2.setId(2);
+        user2.setId(USER_ID_2);
         user2.setFirstName("Jane");
         user2.setLastName("Doe");
         user2.setEmail("jane@doe.com");
@@ -67,13 +69,13 @@ class UserResponseMapperTest {
         UserResponseDto responseDto1 = responseDtoPage.getContent().get(0);
         UserResponseDto responseDto2 = responseDtoPage.getContent().get(1);
 
-        assertEquals(1, responseDto1.getId());
+        assertEquals(USER_ID_1, responseDto1.getId());
         assertEquals("John", responseDto1.getFirstName());
         assertEquals("Doe", responseDto1.getLastName());
         assertEquals("john@doe.com", responseDto1.getEmail());
         assertEquals(UserRole.CUSTOMER, responseDto1.getRole());
 
-        assertEquals(2, responseDto2.getId());
+        assertEquals(USER_ID_2, responseDto2.getId());
         assertEquals("Jane", responseDto2.getFirstName());
         assertEquals("Doe", responseDto2.getLastName());
         assertEquals("jane@doe.com", responseDto2.getEmail());

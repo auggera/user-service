@@ -42,7 +42,7 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
+    private static final long USER_ID = 1;
     UserRegistrationRequestDto userRegistrationRequestDto;
     UserResponseDto userResponseDto;
     ChangeEmailRequestDto changeEmailRequestDto;
@@ -63,7 +63,7 @@ class UserControllerTest {
         userRegistrationRequestDto.setRole(UserRole.CUSTOMER);
 
         userResponseDto = new UserResponseDto();
-        userResponseDto.setId(1);
+        userResponseDto.setId(USER_ID);
         userResponseDto.setFirstName("John");
         userResponseDto.setLastName("Doe");
         userResponseDto.setEmail("john@example.com");
@@ -114,8 +114,8 @@ class UserControllerTest {
     @Test
     void testGetAllUsers() throws Exception {
         List<UserResponseDto> users = Arrays.asList(
-                new UserResponseDto(1, "John", "Doe", "john@example.com", UserRole.CUSTOMER),
-                new UserResponseDto(2, "Jane", "Doe", "jane@example.com", UserRole.CUSTOMER)
+                new UserResponseDto(1L, "John", "Doe", "john@example.com", UserRole.CUSTOMER),
+                new UserResponseDto(2L, "Jane", "Doe", "jane@example.com", UserRole.CUSTOMER)
         );
         Page<UserResponseDto> userPage = new PageImpl<>(users);
 
@@ -136,10 +136,10 @@ class UserControllerTest {
 
     @Test
     void testGetUserByIdSuccessfully() throws Exception {
-        Mockito.when(userService.getUserById(1))
+        Mockito.when(userService.getUserById(USER_ID))
                 .thenReturn(userResponseDto);
 
-        mockMvc.perform(get("/api/users/1"))
+        mockMvc.perform(get("/api/users/{id}", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.firstName").value("John"))
@@ -149,12 +149,12 @@ class UserControllerTest {
 
     @Test
     void testGetUserByIdNotFoundException() throws Exception {
-        Mockito.when(userService.getUserById(1))
-                .thenThrow(new UserNotFoundException(1));
+        Mockito.when(userService.getUserById(USER_ID))
+                .thenThrow(new UserNotFoundException(USER_ID));
 
-        mockMvc.perform(get("/api/users/1"))
+        mockMvc.perform(get("/api/users/{id}", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @BeforeEach
@@ -165,7 +165,7 @@ class UserControllerTest {
 
     @Test
     void testChangeEmailSuccessfully() throws Exception {
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
             .content(objectMapper.writeValueAsString(changeEmailRequestDto))
             .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -173,22 +173,22 @@ class UserControllerTest {
 
     @Test
     void testChangeEmailUserNotFoundException() throws Exception {
-        Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
+        Mockito.doThrow(new UserNotFoundException(USER_ID))
+                .when(userService).updateEmailAddress(USER_ID, changeEmailRequestDto);
 
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                 .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @Test
     void testChangeEmailAddressNotChangedException() throws Exception {
         Mockito.doThrow(new EmailNotChangedException())
-                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
+                .when(userService).updateEmailAddress(USER_ID, changeEmailRequestDto);
 
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                 .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -198,9 +198,9 @@ class UserControllerTest {
     @Test
     void testChangeEmailAddressAlreadyExistException() throws Exception {
         Mockito.doThrow(new EmailAlreadyExistsException(changeEmailRequestDto.getNewEmail()))
-                .when(userService).updateEmailAddress(1, changeEmailRequestDto);
+                .when(userService).updateEmailAddress(USER_ID, changeEmailRequestDto);
 
-        mockMvc.perform(put("/api/users/1/email")
+        mockMvc.perform(put("/api/users/{id}/email", USER_ID)
                 .content(objectMapper.writeValueAsString(changeEmailRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -216,7 +216,7 @@ class UserControllerTest {
 
     @Test
     void testChangePasswordSuccessfully() throws Exception {
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                 .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -224,22 +224,22 @@ class UserControllerTest {
 
     @Test
     void testChangePasswordUserNotFoundException() throws Exception {
-        Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updatePassword(1, changePasswordRequestDto);
+        Mockito.doThrow(new UserNotFoundException(USER_ID))
+                .when(userService).updatePassword(USER_ID, changePasswordRequestDto);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                 .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @Test
     void testChangePasswordIncorrectCurrentPasswordException() throws Exception {
         Mockito.doThrow(new IncorrectCurrentPasswordException())
-                .when(userService).updatePassword(1, changePasswordRequestDto);
+                .when(userService).updatePassword(USER_ID, changePasswordRequestDto);
 
-        mockMvc.perform(put("/api/users/1/password" )
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID )
                 .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -249,9 +249,9 @@ class UserControllerTest {
     @Test
     void testChangePasswordNotChangedException() throws Exception {
         Mockito.doThrow(new PasswordNotChangedException())
-                .when(userService).updatePassword(1, changePasswordRequestDto);
+                .when(userService).updatePassword(USER_ID, changePasswordRequestDto);
 
-        mockMvc.perform(put("/api/users/1/password")
+        mockMvc.perform(put("/api/users/{id}/password", USER_ID)
                 .content(objectMapper.writeValueAsString(changePasswordRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -267,7 +267,7 @@ class UserControllerTest {
 
     @Test
     void testChangePhoneNumberSuccessfully() throws Exception {
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                 .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -275,22 +275,22 @@ class UserControllerTest {
 
     @Test
     void testChangePhoneNumberUserNotFoundException() throws Exception {
-        Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updatePhoneNumber(1, changePhoneNumberRequestDto);
+        Mockito.doThrow(new UserNotFoundException(USER_ID))
+                .when(userService).updatePhoneNumber(USER_ID, changePhoneNumberRequestDto);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                 .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @Test
     void testChangePhoneNumberNotChangedException() throws Exception {
         Mockito.doThrow(new PhoneNumberNotChangedException())
-                .when(userService).updatePhoneNumber(1, changePhoneNumberRequestDto);
+                .when(userService).updatePhoneNumber(USER_ID, changePhoneNumberRequestDto);
 
-        mockMvc.perform(put("/api/users/1/phone")
+        mockMvc.perform(put("/api/users/{id}/phone", USER_ID)
                 .content(objectMapper.writeValueAsString(changePhoneNumberRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -306,7 +306,7 @@ class UserControllerTest {
 
     @Test
     void testUpdateNameSuccessfully() throws Exception {
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -314,22 +314,22 @@ class UserControllerTest {
 
     @Test
     void testUpdateNameUserNotFoundException() throws Exception {
-        Mockito.doThrow(new UserNotFoundException(1))
-                .when(userService).updateName(1, updateNameRequestDto);
+        Mockito.doThrow(new UserNotFoundException(USER_ID))
+                .when(userService).updateName(USER_ID, updateNameRequestDto);
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @Test
     void testUpdateNameNotChangedException() throws Exception {
         Mockito.doThrow(new NameNotChangedException())
-                .when(userService).updateName(1, updateNameRequestDto);
+                .when(userService).updateName(USER_ID, updateNameRequestDto);
 
-        mockMvc.perform(patch("/api/users/1/name")
+        mockMvc.perform(patch("/api/users/{id}/name", USER_ID)
                 .content(objectMapper.writeValueAsString(updateNameRequestDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -338,18 +338,18 @@ class UserControllerTest {
 
     @Test
     void testDeleteUserSuccessfully() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/{id}", USER_ID))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteUserNotFoundException() throws Exception {
-        Mockito.doThrow(new UserNotFoundException(1))
-                        .when(userService).deleteUser(1);
+        Mockito.doThrow(new UserNotFoundException(USER_ID))
+                        .when(userService).deleteUser(USER_ID);
 
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/users/{id}", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID 1 not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 
     @BeforeEach
@@ -361,12 +361,11 @@ class UserControllerTest {
 
     @Test
     void testGetUserEmailInfoSuccessfully() throws Exception {
-        int userId = 1;
 
-        Mockito.when(userService.getUserEmailInfo(userId))
+        Mockito.when(userService.getUserEmailInfo(USER_ID))
                 .thenReturn(emailInfoResponseDto);
 
-        mockMvc.perform(get("/api/users/{id}/email/info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("email@example.com"))
                 .andExpect(jsonPath("$.verified").value(false));
@@ -374,13 +373,12 @@ class UserControllerTest {
 
     @Test
     void testGetUserEmailInfoUserNotFound() throws Exception {
-        int userId = 1;
 
-        Mockito.when(userService.getUserEmailInfo(userId))
-                .thenThrow(new UserNotFoundException(userId));
+        Mockito.when(userService.getUserEmailInfo(USER_ID))
+                .thenThrow(new UserNotFoundException(USER_ID));
 
-        mockMvc.perform(get("/api/users/{id}/email/info", userId))
+        mockMvc.perform(get("/api/users/{id}/email/info", USER_ID))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("User with ID " + userId + " not found"));
+                .andExpect(content().string("User with ID " + USER_ID + " not found"));
     }
 }
